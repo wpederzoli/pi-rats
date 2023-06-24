@@ -13,9 +13,7 @@ pub fn update_cell(
 ) {
     let (mut player_pos, input) = player.single_mut();
 
-    //TODO: Add size constant to cells and then check if the click is > than cell.x and < than cell.w.
     for transform in cell.iter() {
-        println!("cell x: {}", transform.translation.x);
         if transform.translation.x - CELL_SIZE / 2. <= input.destination.x
             && transform.translation.x + CELL_SIZE / 2. >= input.destination.x
             && transform.translation.y - CELL_SIZE / 2. <= input.destination.y
