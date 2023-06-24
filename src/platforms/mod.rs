@@ -1,16 +1,19 @@
 use bevy::prelude::*;
+use rand::prelude::*;
 
 use crate::{WINDOW_HEIGHT, WINDOW_WIDTH};
 
-const PLATFORM_WIDTH: f32 = 300.;
-const PLATFORM_HEIGHT: f32 = 600.;
+use self::cell::{update_cell, GameCell, CELL_SIZE};
+
+pub mod cell;
+
 const PLATFORM_LAYER: f32 = 1.;
 
 pub struct PlatformsPlugin;
 
 impl Plugin for PlatformsPlugin {
     fn build(&self, app: &mut App) {
-        app.add_startup_system(setup);
+        app.add_startup_system(setup).add_system(update_cell);
     }
 }
 
@@ -20,31 +23,36 @@ fn setup(mut commands: Commands) {
     for i in 1..=x_size as u32 {
         for j in 1..=y_size as u32 {
             commands.spawn(create_platform(
-                (-WINDOW_WIDTH / 2.) + (PLATFORM_WIDTH / x_size) * i as f32,
-                (WINDOW_HEIGHT / 2.) - (PLATFORM_HEIGHT / y_size) * j as f32,
-                Vec2::new(PLATFORM_WIDTH / x_size, PLATFORM_HEIGHT / y_size),
+                (-WINDOW_WIDTH / 2.) + CELL_SIZE * i as f32,
+                (WINDOW_HEIGHT / 2.) - CELL_SIZE * j as f32,
+                Vec2::new(CELL_SIZE, CELL_SIZE),
             ));
         }
     }
     for i in 1..=x_size as u32 {
         for j in 1..=y_size as u32 {
             commands.spawn(create_platform(
-                (WINDOW_WIDTH / 2.) - (PLATFORM_WIDTH / x_size) * i as f32,
-                (WINDOW_HEIGHT / 2.) - (PLATFORM_HEIGHT / y_size) * j as f32,
-                Vec2::new(PLATFORM_WIDTH / x_size, PLATFORM_HEIGHT / y_size),
+                (WINDOW_WIDTH / 2.) - CELL_SIZE * i as f32,
+                (WINDOW_HEIGHT / 2.) - CELL_SIZE * j as f32,
+                Vec2::new(CELL_SIZE, CELL_SIZE),
             ));
         }
     }
 }
 
-fn create_platform(x: f32, y: f32, size: Vec2) -> SpriteBundle {
-    SpriteBundle {
-        sprite: Sprite {
-            color: Color::ORANGE_RED,
-            custom_size: Some(size),
+fn create_platform(x: f32, y: f32, size: Vec2) -> (SpriteBundle, GameCell) {
+    let mut rng = rand::thread_rng();
+    let rand_color = rng.gen();
+    (
+        SpriteBundle {
+            sprite: Sprite {
+                color: Color::rgb(rand_color, 0.2, 0.2),
+                custom_size: Some(size),
+                ..default()
+            },
+            transform: Transform::from_xyz(x, y, PLATFORM_LAYER),
             ..default()
         },
-        transform: Transform::from_xyz(x, y, PLATFORM_LAYER),
-        ..default()
-    }
+        GameCell,
+    )
 }

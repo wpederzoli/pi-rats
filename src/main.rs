@@ -3,11 +3,16 @@ use bevy::{
     window::{close_on_esc, WindowResolution},
 };
 use platforms::PlatformsPlugin;
+use player::PlayerPlugin;
 
 mod platforms;
+mod player;
 
 pub const WINDOW_WIDTH: f32 = 1280.;
 pub const WINDOW_HEIGHT: f32 = 720.;
+
+#[derive(Component)]
+pub struct MainCamera;
 
 fn main() {
     App::new()
@@ -21,12 +26,13 @@ fn main() {
         }))
         .add_startup_system(setup)
         .add_plugin(PlatformsPlugin)
+        .add_plugin(PlayerPlugin)
         .add_system(close_on_esc)
         .run();
 }
 
 fn setup(mut commands: Commands) {
-    commands.spawn(Camera2dBundle::default());
+    commands.spawn((Camera2dBundle::default(), MainCamera));
     commands.spawn(SpriteBundle {
         sprite: Sprite {
             color: Color::BLUE,
