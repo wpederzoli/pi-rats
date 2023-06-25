@@ -19,11 +19,18 @@ pub fn update_cell(
             && transform.translation.y - CELL_SIZE / 2. <= input.destination.y
             && transform.translation.y + CELL_SIZE / 2. >= input.destination.y
         {
-            player_pos.translation = Vec3::new(
-                transform.translation.x,
-                transform.translation.y,
-                PLAYER_LAYER,
-            );
+            if player_pos.translation.x < transform.translation.x {
+                player_pos.translation.x += 2.;
+            }
+            if player_pos.translation.x > transform.translation.x {
+                player_pos.translation.x -= 2.;
+            }
+            if player_pos.translation.y < transform.translation.y {
+                player_pos.translation.y += 2.;
+            }
+            if player_pos.translation.y > transform.translation.y {
+                player_pos.translation.y -= 2.;
+            }
         }
     }
 }
