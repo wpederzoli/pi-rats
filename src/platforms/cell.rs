@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::player::{input::InputSystem, Player, PLAYER_LAYER};
+use crate::player::{input::InputSystem, Player, PLAYER_SPEED};
 
 #[derive(Component)]
 pub struct GameCell;
@@ -19,17 +19,12 @@ pub fn update_cell(
             && transform.translation.y - CELL_SIZE / 2. <= input.destination.y
             && transform.translation.y + CELL_SIZE / 2. >= input.destination.y
         {
-            if player_pos.translation.x < transform.translation.x {
-                player_pos.translation.x += 2.;
-            }
-            if player_pos.translation.x > transform.translation.x {
-                player_pos.translation.x -= 2.;
-            }
-            if player_pos.translation.y < transform.translation.y {
-                player_pos.translation.y += 2.;
-            }
-            if player_pos.translation.y > transform.translation.y {
-                player_pos.translation.y -= 2.;
+            match &mut player_pos.translation {
+                mut pos if pos.x > transform.translation.x => pos.x -= PLAYER_SPEED,
+                mut pos if pos.x < transform.translation.x => pos.x += PLAYER_SPEED,
+                mut pos if pos.y > transform.translation.y => pos.y -= PLAYER_SPEED,
+                mut pos if pos.y < transform.translation.y => pos.y += PLAYER_SPEED,
+                _ => (),
             }
         }
     }

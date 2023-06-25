@@ -8,6 +8,7 @@ use crate::{WINDOW_HEIGHT, WINDOW_WIDTH};
 
 use self::input::{input_system, InputSystem};
 pub const PLAYER_LAYER: f32 = 2.;
+pub const PLAYER_SPEED: f32 = 2.;
 
 pub struct PlayerPlugin;
 
