@@ -2,6 +2,8 @@ use bevy::{
     prelude::*,
     window::{close_on_esc, WindowResolution},
 };
+use bevy_inspector_egui::quick::WorldInspectorPlugin;
+
 use platforms::PlatformsPlugin;
 use player::PlayerPlugin;
 
@@ -27,6 +29,7 @@ fn main() {
         .add_startup_system(setup)
         .add_plugin(PlatformsPlugin)
         .add_plugin(PlayerPlugin)
+        .add_plugin(WorldInspectorPlugin::new())
         .add_system(close_on_esc)
         .run();
 }

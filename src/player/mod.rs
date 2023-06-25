@@ -25,14 +25,14 @@ fn setup(mut commands: Commands) {
     commands.spawn((
         SpriteBundle {
             sprite: Sprite {
-                color: Color::DARK_GREEN,
+                color: Color::rgba_u8(0, 255, 217, 255),
                 custom_size: Some(Vec2::new(50., 70.)),
                 ..default()
             },
             transform: Transform::from_xyz(
                 (-WINDOW_WIDTH / 2.) + 120.,
                 WINDOW_HEIGHT / 2. - 120.,
-                2.,
+                PLAYER_LAYER,
             ),
             ..default()
         },

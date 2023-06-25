@@ -41,12 +41,10 @@ fn setup(mut commands: Commands) {
 }
 
 fn create_platform(x: f32, y: f32, size: Vec2) -> (SpriteBundle, GameCell) {
-    let mut rng = rand::thread_rng();
-    let rand_color = rng.gen();
     (
         SpriteBundle {
             sprite: Sprite {
-                color: Color::rgb(rand_color, 0.2, 0.2),
+                color: Color::rgba_u8(12, 123, 234, 255),
                 custom_size: Some(size),
                 ..default()
             },
