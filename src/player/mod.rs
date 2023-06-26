@@ -39,6 +39,7 @@ fn setup(mut commands: Commands) {
         Player,
         InputSystem {
             destination: Vec2::new((-WINDOW_WIDTH / 2.) + 120., WINDOW_HEIGHT / 2. - 120.),
+            target: Vec2::new(0., 0.),
         },
     ));
 }

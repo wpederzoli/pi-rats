@@ -10,6 +10,7 @@ use super::Player;
 #[derive(Component)]
 pub struct InputSystem {
     pub destination: Vec2,
+    pub target: Vec2,
 }
 
 pub fn input_system(
@@ -29,6 +30,10 @@ pub fn input_system(
     {
         if mouse_input.pressed(MouseButton::Left) {
             input.destination = world_position;
+        }
+
+        if mouse_input.pressed(MouseButton::Right) {
+            input.target = world_position;
         }
     }
 }
