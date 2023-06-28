@@ -1,5 +1,4 @@
 use bevy::prelude::*;
-use rand::prelude::*;
 
 use crate::{WINDOW_HEIGHT, WINDOW_WIDTH};
 
