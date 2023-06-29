@@ -1,8 +1,9 @@
 use bevy::prelude::*;
 
-use super::Player;
+use super::{input::InputSystem, Player};
 
 const CANNONBALL_LAYER: f32 = 3.;
+const CANNONBALL_SPEED: f32 = 10.;
 
 #[derive(Component)]
 pub struct Cannonball;
@@ -36,5 +37,27 @@ pub fn shoot_cannon(
             transform.translation.y,
         )));
         player.cannon_ready = false;
+    }
+}
+
+pub fn move_cannonball(
+    mut cannonball: Query<&mut Transform, With<Cannonball>>,
+    target: Query<&InputSystem>,
+) {
+    for input in target.iter() {
+        for mut position in cannonball.iter_mut() {
+            if position.translation.x > input.target.x {
+                position.translation.x -= CANNONBALL_SPEED;
+            }
+            if position.translation.x < input.target.x {
+                position.translation.x += CANNONBALL_SPEED;
+            }
+            if position.translation.y > input.target.y {
+                position.translation.y -= CANNONBALL_SPEED;
+            }
+            if position.translation.y < input.target.y {
+                position.translation.y += CANNONBALL_SPEED;
+            }
+        }
     }
 }

@@ -6,7 +6,7 @@ pub mod input;
 use crate::{WINDOW_HEIGHT, WINDOW_WIDTH};
 
 use self::{
-    cannon::{shoot_cannon, ShootCannon},
+    cannon::{move_cannonball, shoot_cannon, ShootCannon},
     input::{input_system, InputSystem},
 };
 pub const PLAYER_LAYER: f32 = 2.;
@@ -24,7 +24,8 @@ impl Plugin for PlayerPlugin {
         app.add_event::<ShootCannon>()
             .add_startup_system(setup)
             .add_system(input_system)
-            .add_system(shoot_cannon);
+            .add_system(shoot_cannon)
+            .add_system(move_cannonball);
     }
 }
 
