@@ -9,10 +9,11 @@ use super::Player;
 
 #[derive(Component)]
 pub struct InputSystem {
-    pub destination: Vec2,
-    pub target: Vec2,
+    pub destination: Option<Vec2>,
+    pub target: Option<Vec2>,
 }
 
+//TODO: add only valid destination and target
 pub fn input_system(
     mut player: Query<&mut InputSystem, With<Player>>,
     mouse_input: Res<Input<MouseButton>>,
@@ -29,11 +30,11 @@ pub fn input_system(
         .map(|ray| ray.origin.truncate())
     {
         if mouse_input.pressed(MouseButton::Left) {
-            input.destination = world_position;
+            input.destination = Some(world_position);
         }
 
         if mouse_input.pressed(MouseButton::Right) {
-            input.target = world_position;
+            input.target = Some(world_position);
         }
     }
 }

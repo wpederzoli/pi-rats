@@ -6,7 +6,7 @@ use self::cell::{update_cell, GameCell, CELL_SIZE};
 
 pub mod cell;
 
-const PLATFORM_LAYER: f32 = 1.;
+pub const PLATFORM_LAYER: f32 = 1.;
 
 pub struct PlatformsPlugin;
 

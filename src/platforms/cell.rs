@@ -16,33 +16,37 @@ pub fn update_cell(
     let (mut player_pos, input, player) = player.single_mut();
 
     for (transform, mut sprite, entity) in cell.iter_mut() {
-        if is_selected(&transform.translation, &input.destination) {
-            commands.entity(entity).insert(selection_overlay(
-                &Color::rgba_u8(0, 255, 0, 200),
-                &transform.translation,
-            ));
+        if let Some(destination) = input.destination {
+            if is_selected(&transform.translation, &destination) {
+                commands.entity(entity).insert(selection_overlay(
+                    &Color::rgba_u8(0, 255, 0, 200),
+                    &transform.translation,
+                ));
 
-            match &mut player_pos.translation {
-                mut pos if pos.x > transform.translation.x => pos.x -= PLAYER_SPEED,
-                mut pos if pos.x < transform.translation.x => pos.x += PLAYER_SPEED,
-                mut pos if pos.y > transform.translation.y => pos.y -= PLAYER_SPEED,
-                mut pos if pos.y < transform.translation.y => pos.y += PLAYER_SPEED,
-                _ => (),
+                match &mut player_pos.translation {
+                    mut pos if pos.x > transform.translation.x => pos.x -= PLAYER_SPEED,
+                    mut pos if pos.x < transform.translation.x => pos.x += PLAYER_SPEED,
+                    mut pos if pos.y > transform.translation.y => pos.y -= PLAYER_SPEED,
+                    mut pos if pos.y < transform.translation.y => pos.y += PLAYER_SPEED,
+                    _ => (),
+                }
             }
         }
 
-        if is_selected(&transform.translation, &input.target) {
-            commands.entity(entity).insert(selection_overlay(
-                &Color::rgba_u8(200, 10, 50, 200),
-                &transform.translation,
-            ));
+        if let Some(target) = input.target {
+            if is_selected(&transform.translation, &target) {
+                commands.entity(entity).insert(selection_overlay(
+                    &Color::rgba_u8(200, 10, 50, 200),
+                    &transform.translation,
+                ));
 
-            if player.cannon_ready {
-                events.send(ShootCannon);
+                if player.cannon_ready {
+                    events.send(ShootCannon);
+                }
+                return;
             }
-        } else {
-            sprite.color = Color::rgba_u8(117, 92, 71, 255); //TODO: Not run every frame.
         }
+        sprite.color = Color::rgba_u8(117, 92, 71, 255); //TODO: Not run every frame.
     }
 }
 
