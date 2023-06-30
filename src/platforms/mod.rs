@@ -8,6 +8,11 @@ pub mod cell;
 
 pub const PLATFORM_LAYER: f32 = 1.;
 
+#[derive(Component)]
+pub struct MovementPlatform;
+#[derive(Component)]
+pub struct TargetPlatform;
+
 pub struct PlatformsPlugin;
 
 impl Plugin for PlatformsPlugin {
@@ -21,20 +26,24 @@ fn setup(mut commands: Commands) {
     let y_size = 5.;
     for i in 1..=x_size as u32 {
         for j in 1..=y_size as u32 {
-            commands.spawn(create_platform(
-                (-WINDOW_WIDTH / 2.) + CELL_SIZE * i as f32,
-                (WINDOW_HEIGHT / 2.) - CELL_SIZE * j as f32,
-                Vec2::new(CELL_SIZE, CELL_SIZE),
-            ));
+            commands
+                .spawn(create_platform(
+                    (-WINDOW_WIDTH / 2.) + CELL_SIZE * i as f32,
+                    (WINDOW_HEIGHT / 2.) - CELL_SIZE * j as f32,
+                    Vec2::new(CELL_SIZE, CELL_SIZE),
+                ))
+                .insert(MovementPlatform);
         }
     }
     for i in 1..=x_size as u32 {
         for j in 1..=y_size as u32 {
-            commands.spawn(create_platform(
-                (WINDOW_WIDTH / 2.) - CELL_SIZE * i as f32,
-                (WINDOW_HEIGHT / 2.) - CELL_SIZE * j as f32,
-                Vec2::new(CELL_SIZE, CELL_SIZE),
-            ));
+            commands
+                .spawn(create_platform(
+                    (WINDOW_WIDTH / 2.) - CELL_SIZE * i as f32,
+                    (WINDOW_HEIGHT / 2.) - CELL_SIZE * j as f32,
+                    Vec2::new(CELL_SIZE, CELL_SIZE),
+                ))
+                .insert(TargetPlatform);
         }
     }
 }

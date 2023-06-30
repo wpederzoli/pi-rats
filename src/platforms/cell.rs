@@ -2,13 +2,23 @@ use bevy::prelude::*;
 
 use crate::player::{cannon::ShootCannon, input::InputSystem, Player, PLAYER_SPEED};
 
+use super::{MovementPlatform, TargetPlatform};
+
 #[derive(Component)]
 pub struct GameCell;
 
 pub const CELL_SIZE: f32 = 100.;
 
 pub fn update_cell(
-    mut cell: Query<(&Transform, &mut Sprite, Entity), (With<GameCell>, Without<Player>)>,
+    mut cell: Query<(&Transform, &mut Sprite, Entity), (With<MovementPlatform>, Without<Player>)>,
+    mut target_cell: Query<
+        (&Transform, &mut Sprite, Entity),
+        (
+            With<TargetPlatform>,
+            Without<MovementPlatform>,
+            Without<Player>,
+        ),
+    >,
     mut player: Query<(&mut Transform, &mut InputSystem, &Player)>,
     mut commands: Commands,
     mut events: EventWriter<ShootCannon>,
@@ -37,7 +47,10 @@ pub fn update_cell(
                 }
             }
         }
+        sprite.color = Color::rgba_u8(117, 92, 71, 255);
+    }
 
+    for (transform, mut sprite, entity) in target_cell.iter_mut() {
         if let Some(position) = input.target.position {
             if is_selected(&transform.translation, &position) {
                 let cell_id = commands
@@ -56,7 +69,7 @@ pub fn update_cell(
                 return;
             }
         }
-        sprite.color = Color::rgba_u8(117, 92, 71, 255); //TODO: Not run every frame.
+        sprite.color = Color::rgba_u8(117, 92, 71, 255);
     }
 }
 
