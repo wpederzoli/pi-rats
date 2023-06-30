@@ -45,9 +45,6 @@ fn setup(mut commands: Commands) {
             ..default()
         },
         Player { cannon_ready: true },
-        InputSystem {
-            destination: None,
-            target: None,
-        },
+        InputSystem::default(),
     ));
 }

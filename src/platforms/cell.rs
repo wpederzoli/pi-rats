@@ -9,19 +9,24 @@ pub const CELL_SIZE: f32 = 100.;
 
 pub fn update_cell(
     mut cell: Query<(&Transform, &mut Sprite, Entity), (With<GameCell>, Without<Player>)>,
-    mut player: Query<(&mut Transform, &InputSystem, &Player)>,
+    mut player: Query<(&mut Transform, &mut InputSystem, &Player)>,
     mut commands: Commands,
     mut events: EventWriter<ShootCannon>,
 ) {
-    let (mut player_pos, input, player) = player.single_mut();
+    let (mut player_pos, mut input, player) = player.single_mut();
 
     for (transform, mut sprite, entity) in cell.iter_mut() {
-        if let Some(destination) = input.destination {
-            if is_selected(&transform.translation, &destination) {
-                commands.entity(entity).insert(selection_overlay(
-                    &Color::rgba_u8(0, 255, 0, 200),
-                    &transform.translation,
-                ));
+        if let Some(position) = input.destination.position {
+            if is_selected(&transform.translation, &position) {
+                let cell = commands
+                    .entity(entity)
+                    .insert(selection_overlay(
+                        &Color::rgba_u8(0, 255, 0, 200),
+                        &transform.translation,
+                    ))
+                    .id();
+
+                input.destination.id = Some(cell);
 
                 match &mut player_pos.translation {
                     mut pos if pos.x > transform.translation.x => pos.x -= PLAYER_SPEED,
@@ -33,12 +38,17 @@ pub fn update_cell(
             }
         }
 
-        if let Some(target) = input.target {
-            if is_selected(&transform.translation, &target) {
-                commands.entity(entity).insert(selection_overlay(
-                    &Color::rgba_u8(200, 10, 50, 200),
-                    &transform.translation,
-                ));
+        if let Some(position) = input.target.position {
+            if is_selected(&transform.translation, &position) {
+                let cell_id = commands
+                    .entity(entity)
+                    .insert(selection_overlay(
+                        &Color::rgba_u8(200, 10, 50, 200),
+                        &transform.translation,
+                    ))
+                    .id();
+
+                input.target.id = Some(cell_id);
 
                 if player.cannon_ready {
                     events.send(ShootCannon);

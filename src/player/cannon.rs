@@ -50,21 +50,23 @@ pub fn move_cannonball(
     mut commands: Commands,
 ) {
     for mut input in input.iter_mut() {
-        if let Some(target) = input.target {
+        if let Some(target_pos) = input.target.position {
             for (mut position, entity) in cannonball.iter_mut() {
                 if let Some(_) = collide(
                     position.translation,
                     CANNONBALL_SIZE,
-                    Vec3::new(target.x, target.y, PLATFORM_LAYER),
+                    Vec3::new(target_pos.x, target_pos.y, PLATFORM_LAYER),
                     Vec2::new(CELL_SIZE, CELL_SIZE),
                 ) {
                     commands.entity(entity).despawn();
-                    input.target = None;
+                    commands.entity(input.target.id.unwrap()).despawn();
+                    input.target.id = None;
+                    input.target.position = None;
                     player.single_mut().cannon_ready = true;
                 } else {
                     let mut pos = position.clone();
                     pos.look_at(
-                        Vec3::new(target.x, target.y, CANNONBALL_LAYER),
+                        Vec3::new(target_pos.x, target_pos.y, CANNONBALL_LAYER),
                         Vec3::new(position.translation.x, position.translation.y, -1.),
                     );
                     position.translation = position.translation + pos.forward() * CANNONBALL_SPEED;
