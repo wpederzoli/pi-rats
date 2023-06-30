@@ -7,11 +7,33 @@ use crate::MainCamera;
 
 use super::Player;
 
-#[derive(Component)]
-pub struct InputSystem {
-    pub destination: Vec2,
+pub struct Target {
+    pub id: Option<Entity>,
+    pub position: Option<Vec2>,
 }
 
+#[derive(Component)]
+pub struct InputSystem {
+    pub destination: Target,
+    pub target: Target,
+}
+
+impl Default for InputSystem {
+    fn default() -> Self {
+        InputSystem {
+            destination: Target {
+                id: None,
+                position: None,
+            },
+            target: Target {
+                id: None,
+                position: None,
+            },
+        }
+    }
+}
+
+//TODO: add only valid destination and target
 pub fn input_system(
     mut player: Query<&mut InputSystem, With<Player>>,
     mouse_input: Res<Input<MouseButton>>,
@@ -28,7 +50,11 @@ pub fn input_system(
         .map(|ray| ray.origin.truncate())
     {
         if mouse_input.pressed(MouseButton::Left) {
-            input.destination = world_position;
+            input.destination.position = Some(world_position);
+        }
+
+        if mouse_input.pressed(MouseButton::Right) {
+            input.target.position = Some(world_position);
         }
     }
 }
