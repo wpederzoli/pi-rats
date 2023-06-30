@@ -45,31 +45,30 @@ pub fn shoot_cannon(
 
 pub fn move_cannonball(
     mut cannonball: Query<(&mut Transform, Entity), With<Cannonball>>,
-    input: Query<&InputSystem>,
+    mut input: Query<&mut InputSystem>,
+    mut player: Query<&mut Player>,
     mut commands: Commands,
 ) {
-    if let Some(target) = input.single().target {
-        for (mut position, entity) in cannonball.iter_mut() {
-            if position.translation.x > target.x {
-                position.translation.x -= CANNONBALL_SPEED;
-            }
-            if position.translation.x < target.x {
-                position.translation.x += CANNONBALL_SPEED;
-            }
-            if position.translation.y > target.y {
-                position.translation.y -= CANNONBALL_SPEED;
-            }
-            if position.translation.y < target.y {
-                position.translation.y += CANNONBALL_SPEED;
-            }
-
-            if let Some(_) = collide(
-                position.translation,
-                CANNONBALL_SIZE,
-                Vec3::new(target.x, target.y, PLATFORM_LAYER),
-                Vec2::new(CELL_SIZE, CELL_SIZE),
-            ) {
-                commands.entity(entity).despawn();
+    for mut input in input.iter_mut() {
+        if let Some(target) = input.target {
+            for (mut position, entity) in cannonball.iter_mut() {
+                if let Some(_) = collide(
+                    position.translation,
+                    CANNONBALL_SIZE,
+                    Vec3::new(target.x, target.y, PLATFORM_LAYER),
+                    Vec2::new(CELL_SIZE, CELL_SIZE),
+                ) {
+                    commands.entity(entity).despawn();
+                    input.target = None;
+                    player.single_mut().cannon_ready = true;
+                } else {
+                    let mut pos = position.clone();
+                    pos.look_at(
+                        Vec3::new(target.x, target.y, CANNONBALL_LAYER),
+                        Vec3::new(position.translation.x, position.translation.y, -1.),
+                    );
+                    position.translation = position.translation + pos.forward() * CANNONBALL_SPEED;
+                }
             }
         }
     }
