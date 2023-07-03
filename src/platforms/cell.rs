@@ -1,6 +1,9 @@
 use bevy::prelude::*;
 
-use crate::player::{cannon::ShootCannon, input::InputSystem, Player, PLAYER_SPEED};
+use crate::{
+    path_finding::FindPath,
+    player::{cannon::ShootCannon, input::InputSystem, Player, PLAYER_SPEED},
+};
 
 use super::{MovementPlatform, TargetPlatform};
 
@@ -19,11 +22,12 @@ pub fn update_cell(
             Without<Player>,
         ),
     >,
-    mut player: Query<(&mut Transform, &mut InputSystem, &Player)>,
+    mut player: Query<(&mut Transform, &mut InputSystem, &mut Player)>,
     mut commands: Commands,
-    mut events: EventWriter<ShootCannon>,
+    mut shoot_event: EventWriter<ShootCannon>,
+    mut find_path_event: EventWriter<FindPath>,
 ) {
-    let (mut player_pos, mut input, player) = player.single_mut();
+    let (mut player_pos, mut input, mut player) = player.single_mut();
 
     for (transform, mut sprite, entity) in cell.iter_mut() {
         if let Some(position) = input.destination.position {
@@ -45,6 +49,13 @@ pub fn update_cell(
                     mut pos if pos.y < transform.translation.y => pos.y += PLAYER_SPEED,
                     _ => (),
                 }
+
+                if !player.finding_path {
+                    find_path_event.send(FindPath {
+                        destiny: Vec2::from(position),
+                    });
+                    player.finding_path = true;
+                }
             }
         }
         sprite.color = Color::rgba_u8(117, 92, 71, 255);
@@ -64,7 +75,7 @@ pub fn update_cell(
                 input.target.id = Some(cell_id);
 
                 if player.cannon_ready {
-                    events.send(ShootCannon);
+                    shoot_event.send(ShootCannon);
                 }
                 return;
             }

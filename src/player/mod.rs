@@ -2,8 +2,9 @@ use bevy::prelude::*;
 
 pub mod cannon;
 pub mod input;
+// mod path_finding;
 
-use crate::{WINDOW_HEIGHT, WINDOW_WIDTH};
+use crate::{path_finding::Path, WINDOW_HEIGHT, WINDOW_WIDTH};
 
 use self::{
     cannon::{move_cannonball, shoot_cannon, ShootCannon},
@@ -17,6 +18,7 @@ pub struct PlayerPlugin;
 #[derive(Component)]
 pub struct Player {
     pub cannon_ready: bool,
+    pub finding_path: bool,
 }
 
 impl Plugin for PlayerPlugin {
@@ -44,7 +46,11 @@ fn setup(mut commands: Commands) {
             ),
             ..default()
         },
-        Player { cannon_ready: true },
+        Player {
+            cannon_ready: true,
+            finding_path: false,
+        },
         InputSystem::default(),
+        Path::default(),
     ));
 }

@@ -7,6 +7,8 @@ use self::cell::{update_cell, GameCell, CELL_SIZE};
 pub mod cell;
 
 pub const PLATFORM_LAYER: f32 = 1.;
+pub const PLATFORM_WIDTH: u8 = 3;
+pub const PLATFORM_HEIGHT: u8 = 5;
 
 #[derive(Component)]
 pub struct MovementPlatform;
@@ -22,10 +24,8 @@ impl Plugin for PlatformsPlugin {
 }
 
 fn setup(mut commands: Commands) {
-    let x_size = 3.;
-    let y_size = 5.;
-    for i in 1..=x_size as u32 {
-        for j in 1..=y_size as u32 {
+    for i in 1..=PLATFORM_WIDTH {
+        for j in 1..=PLATFORM_HEIGHT {
             commands
                 .spawn(create_platform(
                     (-WINDOW_WIDTH / 2.) + CELL_SIZE * i as f32,
@@ -35,8 +35,8 @@ fn setup(mut commands: Commands) {
                 .insert(MovementPlatform);
         }
     }
-    for i in 1..=x_size as u32 {
-        for j in 1..=y_size as u32 {
+    for i in 1..=PLATFORM_WIDTH {
+        for j in 1..=PLATFORM_HEIGHT {
             commands
                 .spawn(create_platform(
                     (WINDOW_WIDTH / 2.) - CELL_SIZE * i as f32,

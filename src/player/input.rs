@@ -33,7 +33,6 @@ impl Default for InputSystem {
     }
 }
 
-//TODO: add only valid destination and target
 pub fn input_system(
     mut player: Query<&mut InputSystem, With<Player>>,
     mouse_input: Res<Input<MouseButton>>,
