@@ -1,6 +1,9 @@
 use bevy::prelude::*;
 
-use crate::player::{cannon::ShootCannon, input::InputSystem, Player, PLAYER_SPEED};
+use crate::{
+    path_finding::FindPath,
+    player::{cannon::ShootCannon, input::InputSystem, Player, PLAYER_SPEED},
+};
 
 use super::{MovementPlatform, TargetPlatform};
 
@@ -22,7 +25,7 @@ pub fn update_cell(
     mut player: Query<(&mut Transform, &mut InputSystem, &mut Player)>,
     mut commands: Commands,
     mut shoot_event: EventWriter<ShootCannon>,
-    // mut find_path_event: EventWriter<FindPath>,
+    mut find_path_event: EventWriter<FindPath>,
 ) {
     let (mut player_pos, mut input, mut player) = player.single_mut();
 
@@ -39,19 +42,20 @@ pub fn update_cell(
 
                 input.destination.id = Some(cell);
 
-                match &mut player_pos.translation {
-                    mut pos if pos.x > transform.translation.x => pos.x -= PLAYER_SPEED,
-                    mut pos if pos.x < transform.translation.x => pos.x += PLAYER_SPEED,
-                    mut pos if pos.y > transform.translation.y => pos.y -= PLAYER_SPEED,
-                    mut pos if pos.y < transform.translation.y => pos.y += PLAYER_SPEED,
-                    _ => (),
-                }
+                // match &mut player_pos.translation {
+                //     mut pos if pos.x > transform.translation.x => pos.x -= PLAYER_SPEED,
+                //     mut pos if pos.x < transform.translation.x => pos.x += PLAYER_SPEED,
+                //     mut pos if pos.y > transform.translation.y => pos.y -= PLAYER_SPEED,
+                //     mut pos if pos.y < transform.translation.y => pos.y += PLAYER_SPEED,
+                //     _ => (),
+                // }
 
                 if !player.finding_path {
-                    // find_path_event.send(FindPath {
-                    //     destiny: Vec2::from(position),
-                    // });
-                    // player.finding_path = true;
+                    find_path_event.send(FindPath {
+                        start: Vec2::new(player_pos.translation.x, player_pos.translation.y),
+                        goal: Vec2::new(transform.translation.x, transform.translation.y),
+                    });
+                    player.finding_path = true;
                 }
             }
         }

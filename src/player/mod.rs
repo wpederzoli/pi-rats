@@ -4,7 +4,7 @@ pub mod cannon;
 pub mod input;
 // mod path_finding;
 
-use crate::{WINDOW_HEIGHT, WINDOW_WIDTH};
+use crate::{platforms::cell::CELL_SIZE, WINDOW_HEIGHT, WINDOW_WIDTH};
 
 use self::{
     cannon::{move_cannonball, shoot_cannon, ShootCannon},
@@ -40,8 +40,8 @@ fn setup(mut commands: Commands) {
                 ..default()
             },
             transform: Transform::from_xyz(
-                (-WINDOW_WIDTH / 2.) + 120.,
-                WINDOW_HEIGHT / 2. - 120.,
+                (-WINDOW_WIDTH / 2.) + CELL_SIZE,
+                WINDOW_HEIGHT / 2. - CELL_SIZE,
                 PLAYER_LAYER,
             ),
             ..default()
