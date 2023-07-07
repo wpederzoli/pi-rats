@@ -3,10 +3,11 @@ use bevy::prelude::*;
 use crate::{
     path_finding::a_star::{a_star, vec2_to_position},
     platforms::{cell::CELL_SIZE, MovementPlatform},
+    player::MovePlayer,
     WINDOW_HEIGHT, WINDOW_WIDTH,
 };
 
-mod a_star;
+pub mod a_star;
 
 pub struct PathFindingPlugin;
 
@@ -21,8 +22,12 @@ impl Plugin for PathFindingPlugin {
     }
 }
 
-fn find_path(mut event: EventReader<FindPath>, cells: Query<&Transform, With<MovementPlatform>>) {
-    for e in event.iter() {
+fn find_path(
+    mut path_event: EventReader<FindPath>,
+    cells: Query<&Transform, With<MovementPlatform>>,
+    mut player_event: EventWriter<MovePlayer>,
+) {
+    for e in path_event.iter() {
         let map_start = Vec2::new(
             (-WINDOW_WIDTH / 2.) + CELL_SIZE,
             WINDOW_HEIGHT / 2. - CELL_SIZE,
@@ -42,5 +47,7 @@ fn find_path(mut event: EventReader<FindPath>, cells: Query<&Transform, With<Mov
 
         let path = a_star(&start, &goal, &nodes_graph);
         println!("path: {:?}", path);
+
+        player_event.send(MovePlayer(path));
     }
 }

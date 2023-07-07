@@ -27,7 +27,7 @@ pub fn update_cell(
     mut shoot_event: EventWriter<ShootCannon>,
     mut find_path_event: EventWriter<FindPath>,
 ) {
-    let (mut player_pos, mut input, mut player) = player.single_mut();
+    let (player_pos, mut input, mut player) = player.single_mut();
 
     for (transform, mut sprite, entity) in cell.iter_mut() {
         if let Some(position) = input.destination.position {
@@ -41,14 +41,6 @@ pub fn update_cell(
                     .id();
 
                 input.destination.id = Some(cell);
-
-                // match &mut player_pos.translation {
-                //     mut pos if pos.x > transform.translation.x => pos.x -= PLAYER_SPEED,
-                //     mut pos if pos.x < transform.translation.x => pos.x += PLAYER_SPEED,
-                //     mut pos if pos.y > transform.translation.y => pos.y -= PLAYER_SPEED,
-                //     mut pos if pos.y < transform.translation.y => pos.y += PLAYER_SPEED,
-                //     _ => (),
-                // }
 
                 if !player.finding_path {
                     find_path_event.send(FindPath {

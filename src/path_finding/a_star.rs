@@ -190,12 +190,31 @@ pub fn vec2_to_position(vec2: &Vec2, start: &Vec2, cell_size: f32) -> Position {
     Position::new(x, y)
 }
 
+pub fn position_to_vec2(position: &Position, start: &Vec2, cell_size: f32) -> Vec2 {
+    let x = start.x + position.x as f32 * cell_size;
+    let y = start.y - position.y as f32 * cell_size;
+
+    Vec2::new(x, y)
+}
+
 #[cfg(test)]
 mod tests {
 
     use bevy::prelude::Vec2;
 
     use super::*;
+
+    #[test]
+    fn get_vec2_from_position() {
+        let start_point = Vec2::new(-10., 10.);
+        let expected_pos = Position::new(1, 0);
+        let vec2 = Vec2::new(-5., 10.);
+        let cell_size = 5.;
+
+        let pos = position_to_vec2(&expected_pos, &start_point, cell_size);
+
+        assert_eq!(pos, vec2);
+    }
 
     #[test]
     fn get_position_from_vec2() {
