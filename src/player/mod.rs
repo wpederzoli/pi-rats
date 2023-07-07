@@ -4,7 +4,7 @@ pub mod cannon;
 pub mod input;
 // mod path_finding;
 
-use crate::{path_finding::Path, WINDOW_HEIGHT, WINDOW_WIDTH};
+use crate::{WINDOW_HEIGHT, WINDOW_WIDTH};
 
 use self::{
     cannon::{move_cannonball, shoot_cannon, ShootCannon},
@@ -51,6 +51,6 @@ fn setup(mut commands: Commands) {
             finding_path: false,
         },
         InputSystem::default(),
-        Path::default(),
+        // Path::default(),
     ));
 }

@@ -1,9 +1,6 @@
 use bevy::prelude::*;
 
-use crate::{
-    path_finding::FindPath,
-    player::{cannon::ShootCannon, input::InputSystem, Player, PLAYER_SPEED},
-};
+use crate::player::{cannon::ShootCannon, input::InputSystem, Player, PLAYER_SPEED};
 
 use super::{MovementPlatform, TargetPlatform};
 
@@ -25,7 +22,7 @@ pub fn update_cell(
     mut player: Query<(&mut Transform, &mut InputSystem, &mut Player)>,
     mut commands: Commands,
     mut shoot_event: EventWriter<ShootCannon>,
-    mut find_path_event: EventWriter<FindPath>,
+    // mut find_path_event: EventWriter<FindPath>,
 ) {
     let (mut player_pos, mut input, mut player) = player.single_mut();
 
@@ -51,10 +48,10 @@ pub fn update_cell(
                 }
 
                 if !player.finding_path {
-                    find_path_event.send(FindPath {
-                        destiny: Vec2::from(position),
-                    });
-                    player.finding_path = true;
+                    // find_path_event.send(FindPath {
+                    //     destiny: Vec2::from(position),
+                    // });
+                    // player.finding_path = true;
                 }
             }
         }
