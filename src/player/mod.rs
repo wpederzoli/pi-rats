@@ -2,7 +2,6 @@ use bevy::prelude::*;
 
 pub mod cannon;
 pub mod input;
-// mod path_finding;
 
 use crate::{platforms::cell::CELL_SIZE, WINDOW_HEIGHT, WINDOW_WIDTH};
 

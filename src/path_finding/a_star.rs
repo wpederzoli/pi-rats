@@ -1,3 +1,5 @@
+use bevy::prelude::Vec2;
+
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub struct Position {
     x: i8,
@@ -181,10 +183,31 @@ fn get_node_at<'a>(position: &Position, graph: &'a mut Vec<Node>) -> Option<&'a 
     None
 }
 
+pub fn vec2_to_position(vec2: &Vec2, start: &Vec2, cell_size: f32) -> Position {
+    let x = ((vec2.x - start.x) / cell_size) as i8;
+    let y = -((vec2.y - start.y) / cell_size) as i8;
+
+    Position::new(x, y)
+}
+
 #[cfg(test)]
 mod tests {
 
+    use bevy::prelude::Vec2;
+
     use super::*;
+
+    #[test]
+    fn get_position_from_vec2() {
+        let start_point = Vec2::new(-10., 10.);
+        let vec2 = Vec2::new(5., 0.);
+        let expected_position = Position::new(3, 2);
+        let cell_size = 5.;
+
+        let pos = vec2_to_position(&vec2, &start_point, cell_size);
+
+        assert_eq!(pos, expected_position);
+    }
 
     #[test]
     fn get_node_from_position() {
