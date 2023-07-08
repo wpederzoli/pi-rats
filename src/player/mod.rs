@@ -4,7 +4,7 @@ pub mod cannon;
 pub mod input;
 
 use crate::{
-    path_finding::a_star::{position_to_vec2, Position},
+    path_finding::a_star::{helpers::position_to_vec2, position::Position},
     platforms::cell::CELL_SIZE,
     WINDOW_HEIGHT, WINDOW_WIDTH,
 };

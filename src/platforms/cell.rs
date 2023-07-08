@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 use crate::{
     path_finding::FindPath,
-    player::{cannon::ShootCannon, input::InputSystem, Player, PLAYER_SPEED},
+    player::{cannon::ShootCannon, input::InputSystem, Player},
 };
 
 use super::{MovementPlatform, TargetPlatform};

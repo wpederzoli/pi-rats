@@ -1,11 +1,10 @@
-use bevy::prelude::*;
-
 use crate::{
-    path_finding::a_star::{a_star, vec2_to_position},
+    path_finding::a_star::{a_star, helpers::vec2_to_position},
     platforms::{cell::CELL_SIZE, MovementPlatform},
     player::MovePlayer,
     WINDOW_HEIGHT, WINDOW_WIDTH,
 };
+use bevy::prelude::*;
 
 pub mod a_star;
 
