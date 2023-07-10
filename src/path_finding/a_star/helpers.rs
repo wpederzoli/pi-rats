@@ -122,13 +122,18 @@ mod tests {
     fn get_valid_neighbors() {
         let graph = vec![
             Node::from(Position::new(0, 0)),
+            Node::from(Position::new(0, 1)),
             Node::from(Position::new(1, 0)),
+            Node::from(Position::new(1, 1)),
             Node::from(Position::new(2, 0)),
         ];
         let node = graph[0].clone();
         let neighbors = get_neighbors(&node, &graph);
 
-        assert_eq!(neighbors, vec![graph[1].clone()]);
+        assert_eq!(
+            neighbors,
+            vec![graph[1].clone(), graph[2].clone(), graph[3].clone()]
+        );
     }
 
     #[test]

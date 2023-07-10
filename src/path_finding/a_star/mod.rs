@@ -34,7 +34,12 @@ pub fn a_star(start: &Position, goal: &Position, graph: &Vec<Position>) -> Vec<P
 
     while let Some(current_node) = to_visit.pop() {
         let current = if to_visit.len() > 0 {
-            get_lowest_f_score(&to_visit)
+            let low = get_lowest_f_score(&to_visit);
+            if low.f_score < current_node.f_score {
+                low
+            } else {
+                current_node
+            }
         } else {
             current_node
         };

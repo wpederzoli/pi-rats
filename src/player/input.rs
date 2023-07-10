@@ -12,6 +12,15 @@ pub struct Target {
     pub position: Option<Vec2>,
 }
 
+impl Target {
+    pub fn none() -> Self {
+        Target {
+            id: None,
+            position: None,
+        }
+    }
+}
+
 #[derive(Component)]
 pub struct InputSystem {
     pub destination: Target,

@@ -31,7 +31,6 @@ fn find_path(
             (-WINDOW_WIDTH / 2.) + CELL_SIZE,
             WINDOW_HEIGHT / 2. - CELL_SIZE,
         );
-        println!("find a path: start: {:?}, goal: {:?}", e.start, e.goal);
         let start = vec2_to_position(&e.start, &map_start, CELL_SIZE);
         let goal = vec2_to_position(&e.goal, &map_start, CELL_SIZE);
 
@@ -45,7 +44,6 @@ fn find_path(
         }
 
         let path = a_star(&start, &goal, &nodes_graph);
-        println!("path: {:?}", path);
 
         player_event.send(MovePlayer(path));
     }

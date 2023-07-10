@@ -11,7 +11,7 @@ use crate::{
 
 use self::{
     cannon::{move_cannonball, shoot_cannon, ShootCannon},
-    input::{input_system, InputSystem},
+    input::{input_system, InputSystem, Target},
 };
 pub const PLAYER_LAYER: f32 = 2.;
 pub const PLAYER_SPEED: f32 = 2.;
@@ -65,12 +65,11 @@ fn setup(mut commands: Commands) {
 
 fn move_player(
     mut move_event: EventReader<MovePlayer>,
-    mut player: Query<(&mut Transform, &mut Player)>,
+    mut player: Query<(&mut Transform, &mut Player, &mut InputSystem)>,
 ) {
-    let (mut transform, mut player) = player.single_mut();
+    let (mut transform, mut player, mut input) = player.single_mut();
 
     for e in move_event.iter() {
-        println!("move to this path: {:?}", e.0);
         player.steps = e.0.clone();
     }
 
@@ -82,7 +81,6 @@ fn move_player(
         );
 
         let pos_in_vec = position_to_vec2(&next_position, &map_start, CELL_SIZE);
-        println!("pos vec: {:?}", pos_in_vec);
 
         if transform.translation.x < pos_in_vec.x {
             transform.translation.x += PLAYER_SPEED
@@ -99,6 +97,11 @@ fn move_player(
 
         if transform.translation.x == pos_in_vec.x && transform.translation.y == pos_in_vec.y {
             player.steps.remove(0);
+        }
+    } else {
+        if player.finding_path {
+            input.destination = Target::none();
+            player.finding_path = false;
         }
     }
 }
