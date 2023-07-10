@@ -1,6 +1,11 @@
 use bevy::prelude::*;
 
-use crate::player::{cannon::ShootCannon, input::InputSystem, Player, PLAYER_SPEED};
+use crate::{
+    path_finding::FindPath,
+    player::{cannon::ShootCannon, input::InputSystem, Player},
+};
+
+use super::{MovementPlatform, TargetPlatform};
 
 #[derive(Component)]
 pub struct GameCell;
@@ -8,12 +13,21 @@ pub struct GameCell;
 pub const CELL_SIZE: f32 = 100.;
 
 pub fn update_cell(
-    mut cell: Query<(&Transform, &mut Sprite, Entity), (With<GameCell>, Without<Player>)>,
-    mut player: Query<(&mut Transform, &mut InputSystem, &Player)>,
+    mut cell: Query<(&Transform, &mut Sprite, Entity), (With<MovementPlatform>, Without<Player>)>,
+    mut target_cell: Query<
+        (&Transform, &mut Sprite, Entity),
+        (
+            With<TargetPlatform>,
+            Without<MovementPlatform>,
+            Without<Player>,
+        ),
+    >,
+    mut player: Query<(&mut Transform, &mut InputSystem, &mut Player)>,
     mut commands: Commands,
-    mut events: EventWriter<ShootCannon>,
+    mut shoot_event: EventWriter<ShootCannon>,
+    mut find_path_event: EventWriter<FindPath>,
 ) {
-    let (mut player_pos, mut input, player) = player.single_mut();
+    let (player_pos, mut input, mut player) = player.single_mut();
 
     for (transform, mut sprite, entity) in cell.iter_mut() {
         if let Some(position) = input.destination.position {
@@ -28,16 +42,19 @@ pub fn update_cell(
 
                 input.destination.id = Some(cell);
 
-                match &mut player_pos.translation {
-                    mut pos if pos.x > transform.translation.x => pos.x -= PLAYER_SPEED,
-                    mut pos if pos.x < transform.translation.x => pos.x += PLAYER_SPEED,
-                    mut pos if pos.y > transform.translation.y => pos.y -= PLAYER_SPEED,
-                    mut pos if pos.y < transform.translation.y => pos.y += PLAYER_SPEED,
-                    _ => (),
+                if !player.finding_path {
+                    find_path_event.send(FindPath {
+                        start: Vec2::new(player_pos.translation.x, player_pos.translation.y),
+                        goal: Vec2::new(transform.translation.x, transform.translation.y),
+                    });
+                    player.finding_path = true;
                 }
             }
         }
+        sprite.color = Color::rgba_u8(117, 92, 71, 255);
+    }
 
+    for (transform, mut sprite, entity) in target_cell.iter_mut() {
         if let Some(position) = input.target.position {
             if is_selected(&transform.translation, &position) {
                 let cell_id = commands
@@ -51,12 +68,12 @@ pub fn update_cell(
                 input.target.id = Some(cell_id);
 
                 if player.cannon_ready {
-                    events.send(ShootCannon);
+                    shoot_event.send(ShootCannon);
                 }
                 return;
             }
         }
-        sprite.color = Color::rgba_u8(117, 92, 71, 255); //TODO: Not run every frame.
+        sprite.color = Color::rgba_u8(117, 92, 71, 255);
     }
 }
 

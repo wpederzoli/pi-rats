@@ -4,9 +4,11 @@ use bevy::{
 };
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 
+use path_finding::PathFindingPlugin;
 use platforms::PlatformsPlugin;
 use player::PlayerPlugin;
 
+mod path_finding;
 mod platforms;
 mod player;
 
@@ -29,6 +31,7 @@ fn main() {
         .add_startup_system(setup)
         .add_plugin(PlatformsPlugin)
         .add_plugin(PlayerPlugin)
+        .add_plugin(PathFindingPlugin)
         .add_plugin(WorldInspectorPlugin::new())
         .add_system(close_on_esc)
         .run();

@@ -12,6 +12,15 @@ pub struct Target {
     pub position: Option<Vec2>,
 }
 
+impl Target {
+    pub fn none() -> Self {
+        Target {
+            id: None,
+            position: None,
+        }
+    }
+}
+
 #[derive(Component)]
 pub struct InputSystem {
     pub destination: Target,
@@ -33,7 +42,6 @@ impl Default for InputSystem {
     }
 }
 
-//TODO: add only valid destination and target
 pub fn input_system(
     mut player: Query<&mut InputSystem, With<Player>>,
     mouse_input: Res<Input<MouseButton>>,
