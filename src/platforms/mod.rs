@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::{WINDOW_HEIGHT, WINDOW_WIDTH};
+use crate::{GameState, WINDOW_HEIGHT, WINDOW_WIDTH};
 
 use self::cell::{update_cell, GameCell, CELL_SIZE};
 
@@ -19,11 +19,20 @@ pub struct PlatformsPlugin;
 
 impl Plugin for PlatformsPlugin {
     fn build(&self, app: &mut App) {
-        app.add_startup_system(setup).add_system(update_cell);
+        app.add_system(setup.in_schedule(OnEnter(GameState::GamePlay)))
+            .add_system(update_cell.in_set(OnUpdate(GameState::GamePlay)));
     }
 }
 
 fn setup(mut commands: Commands) {
+    commands.spawn(SpriteBundle {
+        sprite: Sprite {
+            color: Color::BLUE,
+            custom_size: Some(Vec2::new(WINDOW_WIDTH, WINDOW_HEIGHT)),
+            ..default()
+        },
+        ..default()
+    });
     for i in 1..=PLATFORM_WIDTH {
         for j in 1..=PLATFORM_HEIGHT {
             commands

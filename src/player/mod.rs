@@ -6,7 +6,7 @@ pub mod input;
 use crate::{
     path_finding::a_star::{helpers::position_to_vec2, position::Position},
     platforms::cell::CELL_SIZE,
-    WINDOW_HEIGHT, WINDOW_WIDTH,
+    GameState, WINDOW_HEIGHT, WINDOW_WIDTH,
 };
 
 use self::{
@@ -31,11 +31,11 @@ impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
         app.add_event::<ShootCannon>()
             .add_event::<MovePlayer>()
-            .add_startup_system(setup)
-            .add_system(input_system)
-            .add_system(shoot_cannon)
-            .add_system(move_player)
-            .add_system(move_cannonball);
+            .add_system(setup.in_schedule(OnEnter(GameState::GamePlay)))
+            .add_systems(
+                (input_system, shoot_cannon, move_player, move_cannonball)
+                    .in_set(OnUpdate(GameState::GamePlay)),
+            );
     }
 }
 
