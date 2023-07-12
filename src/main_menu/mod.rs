@@ -1,4 +1,4 @@
-use bevy::{prelude::*, winit::WinitSettings};
+use bevy::prelude::*;
 
 use crate::GameState;
 
@@ -15,8 +15,7 @@ const PRESSED_BUTTON: Color = Color::rgb(0.35, 0.75, 0.35);
 
 impl Plugin for MainMenuPlugin {
     fn build(&self, app: &mut App) {
-        app.insert_resource(WinitSettings::desktop_app())
-            .add_system(setup_menu.in_schedule(OnEnter(GameState::MainMenu)))
+        app.add_system(setup_menu.in_schedule(OnEnter(GameState::MainMenu)))
             .add_system(cleanup_menu.in_schedule(OnExit(GameState::MainMenu)))
             .add_system(button_system.in_set(OnUpdate(GameState::MainMenu)));
     }
