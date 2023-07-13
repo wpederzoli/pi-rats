@@ -4,10 +4,12 @@ use bevy::{
 };
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 
+use main_menu::MainMenuPlugin;
 use path_finding::PathFindingPlugin;
 use platforms::PlatformsPlugin;
 use player::PlayerPlugin;
 
+mod main_menu;
 mod path_finding;
 mod platforms;
 mod player;
@@ -17,6 +19,14 @@ pub const WINDOW_HEIGHT: f32 = 720.;
 
 #[derive(Component)]
 pub struct MainCamera;
+
+#[derive(Clone, Copy, Default, Eq, PartialEq, Debug, Hash, States)]
+enum GameState {
+    #[default]
+    MainMenu,
+    GamePlay,
+    GameOver,
+}
 
 fn main() {
     App::new()
@@ -28,23 +38,17 @@ fn main() {
             }),
             ..default()
         }))
-        .add_startup_system(setup)
+        .add_state::<GameState>()
+        .add_startup_system(setup_camera)
         .add_plugin(PlatformsPlugin)
         .add_plugin(PlayerPlugin)
         .add_plugin(PathFindingPlugin)
         .add_plugin(WorldInspectorPlugin::new())
+        .add_plugin(MainMenuPlugin)
         .add_system(close_on_esc)
         .run();
 }
 
-fn setup(mut commands: Commands) {
+fn setup_camera(mut commands: Commands) {
     commands.spawn((Camera2dBundle::default(), MainCamera));
-    commands.spawn(SpriteBundle {
-        sprite: Sprite {
-            color: Color::BLUE,
-            custom_size: Some(Vec2::new(WINDOW_WIDTH, WINDOW_HEIGHT)),
-            ..default()
-        },
-        ..default()
-    });
 }
