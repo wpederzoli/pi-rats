@@ -11,6 +11,7 @@ pub struct MenuButton {
 pub enum MenuButtonType {
     StartButton,
     CreateParty,
+    JoinParty,
 }
 
 pub fn create_container(position: &UiRect) -> NodeBundle {

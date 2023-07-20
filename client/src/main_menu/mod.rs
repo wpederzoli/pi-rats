@@ -28,6 +28,7 @@ impl Plugin for MainMenuPlugin {
     }
 }
 
+//TODO: refactor
 fn setup_menu(mut commands: Commands, asset_server: Res<AssetServer>) {
     let menu_position = UiRect::new(
         Val::Px((WINDOW_WIDTH / 2.) - MENU_SIZE / 2.),
@@ -64,6 +65,19 @@ fn setup_menu(mut commands: Commands, asset_server: Res<AssetServer>) {
                     button_type: MenuButtonType::CreateParty,
                 });
         })
+        .with_children(|parent| {
+            parent
+                .spawn(create_button(NORMAL_BUTTON))
+                .with_children(|parent| {
+                    parent.spawn(create_text(
+                        "Join Party",
+                        asset_server.load("fonts/FiraSans-Bold.ttf"),
+                    ));
+                })
+                .insert(MenuButton {
+                    button_type: MenuButtonType::JoinParty,
+                });
+        })
         .insert(MainMenu);
 }
 
@@ -81,6 +95,7 @@ fn button_system(
                 match button.button_type {
                     MenuButtonType::StartButton => next_state.set(GameState::GamePlay),
                     MenuButtonType::CreateParty => events.send(CreateRoomEvent),
+                    MenuButtonType::JoinParty => (),
                 }
                 *color = PRESSED_BUTTON.into();
             }
