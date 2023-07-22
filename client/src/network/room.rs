@@ -1,9 +1,18 @@
-use bevy::prelude::{info, Commands};
-use bevy_matchbox::MatchboxSocket;
+use bevy::prelude::{info, ResMut};
+use bevy_matchbox::{prelude::SingleChannel, MatchboxSocket};
 
-const URL: &str = "ws://127.0.0.1:8080/ws/";
+pub fn wait_for_players(mut socket: ResMut<MatchboxSocket<SingleChannel>>) {
+    if socket.get_channel(0).is_err() {
+        println!("players ready");
+        return;
+    }
 
-pub fn create_room(commands: &mut Commands) {
-    info!("connecting to matchbox server: {:?}", URL);
-    commands.insert_resource(MatchboxSocket::new_ggrs(URL));
+    socket.update_peers();
+    let players = socket.players();
+
+    if players.len() < 2 {
+        return;
+    }
+
+    info!("All players joined");
 }

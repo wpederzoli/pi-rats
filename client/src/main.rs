@@ -25,6 +25,7 @@ pub struct MainCamera;
 enum GameState {
     #[default]
     MainMenu,
+    Waiting,
     GamePlay,
     GameOver,
 }

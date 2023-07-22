@@ -1002,6 +1002,7 @@ dependencies = [
  "actix-web",
  "actix-web-actors",
  "bincode",
+ "rand",
 ]
 
 [[package]]
