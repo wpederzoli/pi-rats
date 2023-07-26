@@ -2,10 +2,7 @@ use bevy::prelude::*;
 
 mod main_menu;
 
-use crate::{
-    network::{CreateRoomEvent, JoinRoomEvent},
-    GameState, WINDOW_HEIGHT, WINDOW_WIDTH,
-};
+use crate::{network::CreatePartyEvent, GameState, WINDOW_HEIGHT, WINDOW_WIDTH};
 
 use self::main_menu::{
     create_button, create_container, create_text, MenuButton, MenuButtonType, MENU_SIZE,
@@ -87,16 +84,15 @@ fn button_system(
         (Changed<Interaction>, With<Button>),
     >,
     mut next_state: ResMut<NextState<GameState>>,
-    mut create_events: EventWriter<CreateRoomEvent>,
-    mut join_events: EventWriter<JoinRoomEvent>,
+    mut create_event: EventWriter<CreatePartyEvent>,
 ) {
     for (interaction, mut color, button) in &mut interaction_query {
         match *interaction {
             Interaction::Clicked => {
                 match button.button_type {
                     MenuButtonType::StartButton => next_state.set(GameState::GamePlay),
-                    MenuButtonType::CreateParty => create_events.send(CreateRoomEvent),
-                    MenuButtonType::JoinParty => join_events.send(JoinRoomEvent),
+                    MenuButtonType::CreateParty => create_event.send(CreatePartyEvent),
+                    MenuButtonType::JoinParty => (),
                 }
                 *color = PRESSED_BUTTON.into();
             }

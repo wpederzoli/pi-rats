@@ -1,64 +1,51 @@
-use bevy::prelude::{info, Commands, EventReader, NextState, Plugin, ResMut, Resource};
-use bevy_matchbox::MatchboxSocket;
-
-use crate::GameState;
-
-pub mod room;
+use actix_codec::Framed;
+use awc::{ws, ws::Codec, BoxedSocket, Client};
+use bevy::prelude::*;
+use futures_util::{SinkExt as _, StreamExt as _};
 
 pub struct NetworkPlugin;
 
+pub struct CreatePartyEvent;
+
 #[derive(Resource)]
-pub struct GameNetwork {
-    pub player_one: bool,
-    pub player_two: bool,
+pub struct Connection {
+    ws: Framed<BoxedSocket, Codec>,
 }
 
-impl GameNetwork {
-    pub fn new(player_one: bool, player_two: bool) -> Self {
-        GameNetwork {
-            player_one,
-            player_two,
-        }
-    }
-}
-
-pub struct CreateRoomEvent;
-pub struct JoinRoomEvent;
+unsafe impl Sync for Connection {}
+unsafe impl Send for Connection {}
 
 impl Plugin for NetworkPlugin {
-    fn build(&self, app: &mut bevy::prelude::App) {
-        app.add_event::<CreateRoomEvent>()
-            .add_event::<JoinRoomEvent>()
-            .add_systems((start_matchbox_socket, join_matchbox_socket));
+    fn build(&self, app: &mut App) {
+        app.add_event::<CreatePartyEvent>().add_system(create_party);
     }
 }
 
-fn start_matchbox_socket(
-    mut commands: Commands,
-    mut events: EventReader<CreateRoomEvent>,
-    mut next_state: ResMut<NextState<GameState>>,
-) {
-    for _ in events.iter() {
-        println!("event");
-        let room_url = "ws://127.0.0.1:8080/ws/";
-        info!("connecting to matchbox server: {:?}", room_url);
-        commands.insert_resource(MatchboxSocket::new_ggrs(room_url));
-        commands.insert_resource(GameNetwork::new(true, false));
-        next_state.set(GameState::Waiting);
+#[actix_rt::main]
+async fn create_party(mut create_event: EventReader<CreatePartyEvent>, mut commands: Commands) {
+    for _ in create_event.iter() {
+        let (_resp, mut connection) = Client::new()
+            .ws("ws://127.0.0.1:8080/ws/")
+            .connect()
+            .await
+            .unwrap();
+
+        connection
+            .send(ws::Message::Text("Echo".into()))
+            .await
+            .unwrap();
+        let response = connection.next().await.unwrap().unwrap();
+
+        let con = Connection { ws: connection };
+        commands.insert_resource(con);
+
+        println!("response: {:?}", response);
     }
 }
 
-fn join_matchbox_socket(
-    mut commands: Commands,
-    mut events: EventReader<JoinRoomEvent>,
-    mut next_state: ResMut<NextState<GameState>>,
-) {
-    for _ in events.iter() {
-        println!("event");
-        let room_url = "ws://127.0.0.1:8080/ws/";
-        info!("connecting to matchbox server: {:?}", room_url);
-        commands.insert_resource(MatchboxSocket::new_ggrs(room_url));
-        commands.insert_resource(GameNetwork::new(true, true));
-        next_state.set(GameState::Waiting);
-    }
+async fn read_socket(mut ws: ResMut<Connection>) {
+    ws.ws
+        .send(ws::Message::Text("New message".into()))
+        .await
+        .unwrap();
 }

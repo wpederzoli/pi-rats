@@ -4,7 +4,6 @@ pub mod cannon;
 pub mod input;
 
 use crate::{
-    network::room::wait_for_players,
     path_finding::a_star::{helpers::position_to_vec2, position::Position},
     platforms::cell::CELL_SIZE,
     GameState, WINDOW_HEIGHT, WINDOW_WIDTH,
@@ -33,7 +32,6 @@ impl Plugin for PlayerPlugin {
         app.add_event::<ShootCannon>()
             .add_event::<MovePlayer>()
             .add_system(setup.in_schedule(OnEnter(GameState::Waiting)))
-            .add_system(wait_for_players.in_set(OnUpdate(GameState::Waiting)))
             .add_systems(
                 (input_system, shoot_cannon, move_player, move_cannonball)
                     .in_set(OnUpdate(GameState::GamePlay)),
