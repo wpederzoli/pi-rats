@@ -1,3 +1,5 @@
+use std::str::from_utf8;
+
 use awc::{ws, Client};
 use bevy::prelude::*;
 use futures_util::{SinkExt as _, StreamExt as _};
@@ -45,9 +47,14 @@ async fn create_party(
 
         loop {
             if let Ok(ws_msg) = ws.next().await.unwrap() {
-                //if message OK ROOM CREATED
-                println!("ws: {:?}", ws_msg);
-                join_ev.send(JoinRoomEvent);
+                match ws_msg {
+                    ws::Frame::Text(msg) => match from_utf8(&msg) {
+                        Ok("123") => join_ev.send(JoinRoomEvent),
+                        Ok("Error") => println!("error creating party"),
+                        _ => println!("failed to create new party"),
+                    },
+                    _ => println!("failed to createy party"),
+                }
                 break;
             }
         }
