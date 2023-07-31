@@ -2,13 +2,14 @@ use std::str::from_utf8;
 
 use awc::{ws, Client};
 use bevy::prelude::*;
+use common::RoomAction;
 use futures_util::{SinkExt as _, StreamExt as _};
 
 use crate::GameState;
 
 pub struct NetworkPlugin;
 pub struct CreatePartyEvent;
-pub struct JoinRoomEvent;
+pub struct JoinRoomEvent(String);
 
 impl Plugin for NetworkPlugin {
     fn build(&self, app: &mut App) {
@@ -41,7 +42,7 @@ async fn create_party(
             .await
             .unwrap();
 
-        ws.send(ws::Message::Text("create party".into()))
+        ws.send(ws::Message::Text(RoomAction::CreateRoom.as_string().into()))
             .await
             .unwrap();
 
@@ -49,9 +50,13 @@ async fn create_party(
             if let Ok(ws_msg) = ws.next().await.unwrap() {
                 match ws_msg {
                     ws::Frame::Text(msg) => match from_utf8(&msg) {
-                        Ok("123") => join_ev.send(JoinRoomEvent),
-                        Ok("Error") => println!("error creating party"),
-                        _ => println!("failed to create new party"),
+                        Ok(txt) => match RoomAction::get(txt) {
+                            RoomAction::RoomCreated(room_id) => {
+                                join_ev.send(JoinRoomEvent(room_id))
+                            }
+                            _ => (),
+                        },
+                        _ => println!("Error parsing bytestring"),
                     },
                     _ => println!("failed to createy party"),
                 }
