@@ -25,15 +25,24 @@ impl Actor for ServerWs {
 impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for ServerWs {
     fn handle(&mut self, msg: Result<ws::Message, ws::ProtocolError>, ctx: &mut Self::Context) {
         match msg {
-            Ok(ws::Message::Text(text)) => match RoomAction::get(text.to_string().as_str()) {
-                RoomAction::CreateRoom => {
-                    //Create a room with a UUID and respond with RoomCreated action
-                    //Add to map of room_name - UUID
-                    //containing the newly created roomId
-                    ctx.text("create room")
+            Ok(ws::Message::Text(text)) => {
+                match serde_json::from_str(&text.to_string().as_str()) {
+                    Ok(action) => match action {
+                        RoomAction::CreateRoom => {
+                            println!("create room");
+                            //Create a room with a UUID and respond with RoomCreated action
+                            //Add to map of room_name - UUID
+                            //containing the newly created roomId
+                            let room_json =
+                                serde_json::to_string(&RoomAction::RoomCreated("123".into()))
+                                    .unwrap();
+                            ctx.text(room_json);
+                        }
+                        _ => ctx.text("failed"),
+                    },
+                    _ => (),
                 }
-                _ => ctx.text("failed"),
-            },
+            }
             _ => (),
         }
     }

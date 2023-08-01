@@ -42,7 +42,8 @@ async fn create_party(
             .await
             .unwrap();
 
-        ws.send(ws::Message::Text(RoomAction::CreateRoom.as_string().into()))
+        let create_room_json = serde_json::to_string(&RoomAction::CreateRoom).unwrap();
+        ws.send(ws::Message::Text(create_room_json.into()))
             .await
             .unwrap();
 
@@ -50,13 +51,18 @@ async fn create_party(
             if let Ok(ws_msg) = ws.next().await.unwrap() {
                 match ws_msg {
                     ws::Frame::Text(msg) => match from_utf8(&msg) {
-                        Ok(txt) => match RoomAction::get(txt) {
-                            RoomAction::RoomCreated(room_id) => {
-                                join_ev.send(JoinRoomEvent(room_id))
+                        Ok(txt) => {
+                            let action: RoomAction = serde_json::from_str(txt).unwrap();
+                            match action {
+                                RoomAction::RoomCreated(room_id) => println!("room id {}", room_id),
+                                _ => {
+                                    println!("not action: {:?}", action);
+                                }
                             }
-                            _ => (),
-                        },
-                        _ => println!("Error parsing bytestring"),
+                        }
+                        _ => {
+                            println!("ws message: {:?}", msg);
+                        }
                     },
                     _ => println!("failed to createy party"),
                 }
