@@ -42,7 +42,8 @@ async fn create_party(
             .await
             .unwrap();
 
-        let create_room_json = serde_json::to_string(&RoomAction::CreateRoom).unwrap();
+        let create_room_json =
+            serde_json::to_string(&RoomAction::CreateRoom("test room".into())).unwrap();
         ws.send(ws::Message::Text(create_room_json.into()))
             .await
             .unwrap();
@@ -54,7 +55,7 @@ async fn create_party(
                         Ok(txt) => {
                             let action: RoomAction = serde_json::from_str(txt).unwrap();
                             match action {
-                                RoomAction::RoomCreated(room_id) => println!("room id {}", room_id),
+                                RoomAction::RoomCreated => println!("room id"),
                                 _ => {
                                     println!("not action: {:?}", action);
                                 }
