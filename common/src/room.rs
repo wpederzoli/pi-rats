@@ -4,5 +4,7 @@ use serde::{Deserialize, Serialize};
 pub enum RoomAction {
     CreateRoom(String),
     RoomCreated,
-    Invalid,
+    JoinRoom(String),
+    JoinedRoom,
+    Invalid(String),
 }

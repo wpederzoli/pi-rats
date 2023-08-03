@@ -43,10 +43,22 @@ impl ServerState {
         let mut room = Room::new(room_id);
         room.add_client(client);
         self.rooms.insert(room_name, room);
+        println!("rooms: {:?}", self.rooms);
+    }
+
+    fn join_room(&mut self, room_name: String, client: Addr<ServerWs>) -> Result<(), String> {
+        println!("Joining room {}", room_name);
+        println!("rooms: {:?}", self.rooms);
+        if let Some(room) = self.rooms.get_mut(&room_name) {
+            room.add_client(client);
+            Ok(())
+        } else {
+            Err(format!("Room '{}' does not exist", room_name))
+        }
     }
 }
 
-struct ServerWs {
+pub struct ServerWs {
     state: Arc<Mutex<ServerState>>,
 }
 
@@ -73,7 +85,19 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for ServerWs {
                             .create_room(room_name, ctx.address());
                         let room_json = serde_json::to_string(&RoomAction::RoomCreated).unwrap();
                         ctx.text(room_json);
-                        println!("state: {:?}", self.state);
+                    }
+                    RoomAction::JoinRoom(room_name) => {
+                        println!("join {}", room_name);
+                        if let Err(err) = self
+                            .state
+                            .lock()
+                            .unwrap()
+                            .join_room(room_name, ctx.address())
+                        {
+                            ctx.text(serde_json::to_string(&RoomAction::Invalid(err)).unwrap());
+                        } else {
+                            ctx.text(serde_json::to_string(&RoomAction::JoinedRoom).unwrap());
+                        }
                     }
                     _ => ctx.text("failed"),
                 },
