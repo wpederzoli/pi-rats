@@ -15,15 +15,17 @@ mod room;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    HttpServer::new(|| {
+    let server_data = web::Data::new(Mutex::new(ServerState::new()));
+    let config_server = move || {
         App::new()
             .wrap(Cors::default().allow_any_origin())
-            .app_data(web::Data::new(Mutex::new(ServerState::new())))
+            .app_data(server_data.clone())
             .route("/ws/", web::get().to(index))
-    })
-    .bind(("127.0.0.1", 8080))?
-    .run()
-    .await
+    };
+    HttpServer::new(config_server)
+        .bind(("127.0.0.1", 8080))?
+        .run()
+        .await
 }
 
 #[derive(Debug)]

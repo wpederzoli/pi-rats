@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
 pub const MENU_SIZE: f32 = 400.;
-const BACKGROUND_COLOR: Color = Color::BLACK;
+pub const BACKGROUND_COLOR: Color = Color::BLACK;
 
 #[derive(Component)]
 pub struct MenuButton {
@@ -14,9 +14,9 @@ pub enum MenuButtonType {
     JoinParty,
 }
 
-pub fn create_container(position: &UiRect) -> NodeBundle {
+pub fn create_container(position: &UiRect, color: &Color) -> NodeBundle {
     NodeBundle {
-        background_color: BackgroundColor(BACKGROUND_COLOR),
+        background_color: BackgroundColor(*color),
         style: Style {
             position: *position,
             size: Size::new(Val::Px(MENU_SIZE), Val::Px(MENU_SIZE)),
