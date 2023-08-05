@@ -11,7 +11,7 @@ use crate::{
 
 use self::{
     main_menu::{MenuButton, MenuButtonType},
-    modal::{create_input_field, spawn_modal},
+    modal::{create_input_field, handle_input},
     ui::{create_main_menu, HOVERED_BUTTON_COLOR, NORMAL_BUTTON_COLOR, PRESSED_BUTTON_COLOR},
 };
 
@@ -24,7 +24,8 @@ impl Plugin for MainMenuPlugin {
     fn build(&self, app: &mut App) {
         app.add_system(setup_menu.in_schedule(OnEnter(GameState::MainMenu)))
             .add_system(cleanup_menu.in_schedule(OnExit(GameState::MainMenu)))
-            .add_system(button_system.in_set(OnUpdate(GameState::MainMenu)));
+            .add_system(button_system.in_set(OnUpdate(GameState::MainMenu)))
+            .add_system(handle_input.in_set(OnUpdate(GameState::MainMenu)));
     }
 }
 
@@ -52,7 +53,7 @@ fn button_system(
                     match button.button_type {
                         MenuButtonType::StartButton => next_state.set(GameState::GamePlay),
                         MenuButtonType::CreateParty => {
-                            let font: Handle<Font> = asset_server.load("fonts/FiraSans-Bold.ttf");
+                            let font = asset_server.load("fonts/FiraSans-Bold.ttf");
                             let input_field = create_input_field(&mut commands, font);
                             commands.entity(menu).push_children(&[input_field]);
                         }
