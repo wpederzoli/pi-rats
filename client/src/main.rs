@@ -22,7 +22,7 @@ pub const WINDOW_HEIGHT: f32 = 720.;
 pub struct MainCamera;
 
 #[derive(Clone, Copy, Default, Eq, PartialEq, Debug, Hash, States)]
-enum GameState {
+pub enum GameState {
     #[default]
     MainMenu,
     Waiting,

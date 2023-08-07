@@ -1,18 +1,29 @@
-use bevy::prelude::{info, ResMut};
-use bevy_matchbox::{prelude::SingleChannel, MatchboxSocket};
+use std::str::from_utf8;
 
-pub fn wait_for_players(mut socket: ResMut<MatchboxSocket<SingleChannel>>) {
-    if socket.get_channel(0).is_err() {
-        println!("players ready");
-        return;
+use awc::{ws, Client};
+use bevy::prelude::info;
+use common::RoomAction;
+use futures_util::{SinkExt as _, StreamExt as _};
+
+pub async fn communicate_with_server(room_action: RoomAction) -> RoomAction {
+    let (_res, mut ws) = Client::new()
+        .ws("ws://127.0.0.1:8080/ws/")
+        .connect()
+        .await
+        .unwrap();
+
+    let json_msg = serde_json::to_string(&room_action).unwrap();
+    ws.send(ws::Message::Text(json_msg.into())).await.unwrap();
+
+    loop {
+        if let Ok(ws_msg) = ws.next().await.unwrap() {
+            match ws_msg {
+                ws::Frame::Text(msg) => match from_utf8(&msg) {
+                    Ok(txt) => serde_json::from_str(txt.clone()).unwrap(),
+                    _ => info!("Unexpected message: {:?}", msg),
+                },
+                _ => info!("Failed to process response"),
+            }
+        }
     }
-
-    socket.update_peers();
-    let players = socket.players();
-
-    if players.len() < 2 {
-        return;
-    }
-
-    info!("All players joined");
 }

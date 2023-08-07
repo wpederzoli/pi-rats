@@ -5,8 +5,10 @@ use bevy::prelude::*;
 use common::RoomAction;
 use futures_util::{SinkExt as _, StreamExt as _};
 
+use crate::GameState;
+
 pub struct NetworkPlugin;
-pub struct CreatePartyEvent;
+pub struct CreatePartyEvent(pub String);
 pub struct JoinRoomEvent(pub String);
 
 impl Plugin for NetworkPlugin {
@@ -17,77 +19,55 @@ impl Plugin for NetworkPlugin {
     }
 }
 
+pub async fn connect_to_server(room_action: RoomAction) -> RoomAction {
+    let (_res, mut ws) = Client::new()
+        .ws("ws://127.0.0.1:8080/ws/")
+        .connect()
+        .await
+        .unwrap();
+
+    let json_msg = serde_json::to_string(&room_action).unwrap();
+    ws.send(ws::Message::Text(json_msg.into())).await.unwrap();
+
+    let mut response = RoomAction::Invalid("".to_string());
+
+    loop {
+        if let Ok(ws_msg) = ws.next().await.unwrap() {
+            match ws_msg {
+                ws::Frame::Text(msg) => match from_utf8(&msg) {
+                    Ok(txt) => {
+                        response = serde_json::from_str(txt).unwrap();
+                    }
+                    _ => response = RoomAction::Invalid("Unable to create room".to_string()),
+                },
+                _ => response = RoomAction::Invalid("Something went wrong".to_string()),
+            }
+        }
+        break;
+    }
+
+    response
+}
+
 #[actix_rt::main]
 async fn create_party(
     mut create_ev: EventReader<CreatePartyEvent>,
     mut join_ev: EventReader<JoinRoomEvent>,
+    mut next_state: ResMut<NextState<GameState>>,
 ) {
-    for _ in create_ev.iter() {
-        let (_res, mut ws) = Client::new()
-            .ws("ws://127.0.0.1:8080/ws/")
-            .connect()
-            .await
-            .unwrap();
-
-        let create_room_json =
-            serde_json::to_string(&RoomAction::CreateRoom("test room".into())).unwrap();
-        ws.send(ws::Message::Text(create_room_json.into()))
-            .await
-            .unwrap();
-
-        loop {
-            if let Ok(ws_msg) = ws.next().await.unwrap() {
-                match ws_msg {
-                    ws::Frame::Text(msg) => match from_utf8(&msg) {
-                        Ok(txt) => {
-                            let action: RoomAction = serde_json::from_str(txt).unwrap();
-                            match action {
-                                RoomAction::RoomCreated => println!("room created"),
-                                _ => {
-                                    println!("not action: {:?}", action);
-                                }
-                            }
-                        }
-                        _ => {
-                            println!("ws message: {:?}", msg);
-                        }
-                    },
-                    _ => println!("failed to createy party"),
-                }
-                break;
-            }
+    for create_ev in create_ev.iter() {
+        let r = connect_to_server(RoomAction::CreateRoom(create_ev.0.clone())).await;
+        match r {
+            RoomAction::RoomCreated => next_state.set(GameState::Waiting),
+            _ => info!("Room no created"),
         }
     }
 
-    for ev in join_ev.iter() {
-        let (_res, mut ws) = Client::new()
-            .ws("ws://127.0.0.1:8080/ws/")
-            .connect()
-            .await
-            .unwrap();
-
-        let join_room_json = serde_json::to_string(&RoomAction::JoinRoom(ev.0.clone())).unwrap();
-        ws.send(ws::Message::Text(join_room_json.into()))
-            .await
-            .unwrap();
-
-        loop {
-            if let Ok(ws_msg) = ws.next().await.unwrap() {
-                match ws_msg {
-                    ws::Frame::Text(msg) => match from_utf8(&msg) {
-                        Ok(txt) => {
-                            let action: RoomAction = serde_json::from_str(txt).unwrap();
-                            match action {
-                                RoomAction::JoinedRoom => println!("join success!"),
-                                _ => println!("join room failed {:?}", action),
-                            }
-                        }
-                        _ => println!("ws message: {:?}", msg),
-                    },
-                    _ => println!("failed to join"),
-                }
-            }
-            break;
+    for join_ev in join_ev.iter() {
+        let r = connect_to_server(RoomAction::JoinRoom(join_ev.0.clone())).await;
+        match r {
+            RoomAction::JoinedRoom => next_state.set(GameState::Waiting),
+            _ => info!("Unable to join room"),
         }
     }
 }

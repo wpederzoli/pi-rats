@@ -27,11 +27,15 @@ pub const MENU_SIZE: f32 = 400.;
 pub const BACKGROUND_COLOR: Color = Color::BLACK;
 
 pub fn create_main_menu(commands: &mut Commands, font: Handle<Font>) {
-    let container = create_container(
-        &MENU_POSITION,
-        &BACKGROUND_COLOR,
-        &Size::new(Val::Px(MENU_SIZE), Val::Px(MENU_SIZE)),
-    );
+    let container_style = Style {
+        position: MENU_POSITION,
+        size: Size::new(Val::Px(MENU_SIZE), Val::Px(MENU_SIZE)),
+        align_items: AlignItems::Center,
+        padding: UiRect::new(Val::Px(0.), Val::Px(0.), Val::Px(35.), Val::Px(0.)),
+        flex_direction: FlexDirection::Column,
+        ..default()
+    };
+    let container = create_container(&BACKGROUND_COLOR, &container_style);
     let button = create_button(NORMAL_BUTTON_COLOR);
     let create_txt = create_text("Create Party", font.clone());
     let join_text = create_text("Join Party", font);
@@ -56,20 +60,13 @@ pub fn create_main_menu(commands: &mut Commands, font: Handle<Font>) {
                     button_type: MenuButtonType::JoinParty,
                 });
         })
-        .insert(MainMenu);
+        .insert(MainMenu(true));
 }
 
-pub fn create_container(position: &UiRect, color: &Color, size: &Size) -> NodeBundle {
+pub fn create_container(color: &Color, style: &Style) -> NodeBundle {
     NodeBundle {
         background_color: BackgroundColor(*color),
-        style: Style {
-            position: *position,
-            size: *size,
-            align_items: AlignItems::Center,
-            padding: UiRect::new(Val::Px(0.), Val::Px(0.), Val::Px(35.), Val::Px(0.)),
-            flex_direction: FlexDirection::Column,
-            ..default()
-        },
+        style: style.clone(),
         ..default()
     }
 }
