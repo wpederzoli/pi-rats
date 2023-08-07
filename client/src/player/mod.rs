@@ -31,7 +31,7 @@ impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
         app.add_event::<ShootCannon>()
             .add_event::<MovePlayer>()
-            .add_system(setup.in_schedule(OnEnter(GameState::GamePlay)))
+            .add_system(setup.in_schedule(OnEnter(GameState::Waiting)))
             .add_systems(
                 (input_system, shoot_cannon, move_player, move_cannonball)
                     .in_set(OnUpdate(GameState::GamePlay)),

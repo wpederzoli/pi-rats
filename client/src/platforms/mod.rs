@@ -19,7 +19,7 @@ pub struct PlatformsPlugin;
 
 impl Plugin for PlatformsPlugin {
     fn build(&self, app: &mut App) {
-        app.add_system(setup.in_schedule(OnEnter(GameState::GamePlay)))
+        app.add_system(setup.in_schedule(OnEnter(GameState::Waiting)))
             .add_system(update_cell.in_set(OnUpdate(GameState::GamePlay)));
     }
 }
