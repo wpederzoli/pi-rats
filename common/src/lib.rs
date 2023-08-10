@@ -1,3 +1,3 @@
 mod room;
 
-pub use room::RoomAction;
+pub use room::{GameMessage, RoomAction};

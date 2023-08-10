@@ -4,7 +4,7 @@ use bevy::{
 };
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use main_menu::MainMenuPlugin;
-use network::NetworkPlugin;
+use network::websocket::WebSocketPlugin;
 use path_finding::PathFindingPlugin;
 use platforms::PlatformsPlugin;
 use player::PlayerPlugin;
@@ -42,7 +42,8 @@ fn main() {
         }))
         .add_state::<GameState>()
         .add_startup_system(setup_camera)
-        .add_plugin(NetworkPlugin)
+        // .add_plugin(NetworkPlugin)
+        .add_plugin(WebSocketPlugin)
         .add_plugin(PlatformsPlugin)
         .add_plugin(PlayerPlugin)
         .add_plugin(PathFindingPlugin)

@@ -18,3 +18,4 @@ tokio-stream = "0.1.14"
 common = {path = "../common"}
 serde = {workspace = true }
 serde_json = { workspace = true }
+crossbeam-channel = "0.5.8"

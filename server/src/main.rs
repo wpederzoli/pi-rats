@@ -3,12 +3,12 @@ use std::{
     sync::{Arc, Mutex},
 };
 
-use actix::{Actor, Addr, AsyncContext, StreamHandler};
+use actix::{Actor, Addr, AsyncContext, Handler, StreamHandler};
 use actix_cors::Cors;
 use actix_web::{web, App, Error, HttpRequest, HttpResponse, HttpServer};
 use actix_web_actors::ws;
 use common::RoomAction;
-use room::Room;
+use room::{Room, RoomMessage};
 use uuid::Uuid;
 
 mod room;
@@ -50,9 +50,9 @@ impl ServerState {
 
     fn join_room(&mut self, room_name: String, client: Addr<ServerWs>) -> Result<(), String> {
         println!("Joining room {}", room_name);
-        println!("rooms: {:?}", self.rooms);
         if let Some(room) = self.rooms.get_mut(&room_name) {
             room.add_client(client);
+            println!("rooms: {:?}", self.rooms);
             Ok(())
         } else {
             Err(format!("Room '{}' does not exist", room_name))
@@ -72,6 +72,15 @@ impl ServerWs {
 
 impl Actor for ServerWs {
     type Context = ws::WebsocketContext<Self>;
+}
+
+impl Handler<RoomMessage> for ServerWs {
+    type Result = ();
+
+    fn handle(&mut self, msg: RoomMessage, ctx: &mut Self::Context) -> Self::Result {
+        let json_msg = serde_json::to_string(&msg.0).unwrap();
+        ctx.text(json_msg);
+    }
 }
 
 impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for ServerWs {

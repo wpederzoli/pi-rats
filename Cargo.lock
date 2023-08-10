@@ -3265,6 +3265,7 @@ dependencies = [
  "bevy",
  "bevy-inspector-egui",
  "common",
+ "crossbeam-channel",
  "futures-util",
  "rand",
  "serde",

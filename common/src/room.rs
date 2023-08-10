@@ -8,3 +8,9 @@ pub enum RoomAction {
     JoinedRoom,
     Invalid(String),
 }
+
+#[derive(Serialize, Deserialize, Debug)]
+pub enum GameMessage {
+    PlayerJoined,
+    TestMessage,
+}

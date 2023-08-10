@@ -10,12 +10,12 @@ use bevy::{
     window::ReceivedCharacter,
 };
 
-use crate::network::{CreatePartyEvent, JoinRoomEvent};
-
 use super::{
     ui::{create_button, create_container, create_text, MENU_SIZE, PRESSED_BUTTON_COLOR},
     MainMenu,
 };
+
+use crate::network::room::{CreateRoomEvent, JoinRoomEvent};
 
 const INPUT_FIELD_HEIGHT: f32 = 100.;
 const INPUT_FIELD_CONTAINER_HEIGHT: f32 = 300.;
@@ -139,7 +139,7 @@ pub fn modal_button_system(
     mut main_menu: Query<&mut MainMenu>,
     mut input_text: Query<&mut InputField>,
     mut commands: Commands,
-    mut create_party: EventWriter<CreatePartyEvent>,
+    mut create_party: EventWriter<CreateRoomEvent>,
     mut join_party: EventWriter<JoinRoomEvent>,
 ) {
     for menu in menu.iter() {
@@ -151,7 +151,8 @@ pub fn modal_button_system(
                     let mut text = input_text.single_mut();
                     match button.0 {
                         ModalButtonType::Create => {
-                            create_party.send(CreatePartyEvent(text.0.clone()))
+                            println!("create event");
+                            create_party.send(CreateRoomEvent(text.0.clone()))
                         }
                         ModalButtonType::Join => join_party.send(JoinRoomEvent(text.0.clone())),
                         ModalButtonType::Cancel => {
