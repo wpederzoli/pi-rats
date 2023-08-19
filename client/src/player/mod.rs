@@ -2,6 +2,7 @@ use bevy::prelude::*;
 
 pub mod cannon;
 pub mod input;
+pub mod player;
 
 use crate::{
     path_finding::a_star::{helpers::position_to_vec2, position::Position},

@@ -1,15 +1,18 @@
 use std::{str::from_utf8, thread};
 
 use actix_codec::Framed;
-use awc::{
-    ws::{Codec, Frame},
-    BoxedSocket, Client,
-};
+use awc::{ws::Codec, BoxedSocket, Client};
 use bevy::prelude::*;
 use common::RoomAction;
 use futures_util::{SinkExt, StreamExt};
 
-use crate::GameState;
+use crate::{
+    player::{
+        self,
+        player::{spawn_player, PlayerOne, SpawnPlayer},
+    },
+    GameState,
+};
 
 use super::room::{create_room, join_room, CreateRoomEvent, JoinRoomEvent, URL};
 
@@ -53,6 +56,7 @@ impl Plugin for WebSocketPlugin {
 fn read_messages(
     ch: Res<Channel>,
     ws: Res<WsChannel>,
+    mut commands: Commands,
     mut next_state: ResMut<NextState<GameState>>,
 ) {
     if let Ok(msg) = ch.receiver.try_recv() {
@@ -66,7 +70,10 @@ fn read_messages(
                     next_state.set(GameState::Waiting);
                 }
                 RoomAction::JoinedRoom => next_state.set(GameState::Waiting),
-                RoomAction::PlayerJoined => next_state.set(GameState::GamePlay),
+                RoomAction::PlayerJoined => {
+                    spawn_player(&mut commands, PlayerOne(false));
+                    next_state.set(GameState::GamePlay);
+                }
                 _ => info!("invalid action"),
             }
         }
