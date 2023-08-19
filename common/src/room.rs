@@ -4,9 +4,11 @@ use serde::{Deserialize, Serialize};
 pub enum RoomAction {
     CreateRoom(String),
     RoomCreated,
+    WaitingPlayers,
     JoinRoom(String),
     JoinedRoom,
     Invalid(String),
+    PlayerJoined,
 }
 
 #[derive(Serialize, Deserialize, Debug)]

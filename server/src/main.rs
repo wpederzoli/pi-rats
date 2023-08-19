@@ -51,6 +51,8 @@ impl ServerState {
     fn join_room(&mut self, room_name: String, client: Addr<ServerWs>) -> Result<(), String> {
         println!("Joining room {}", room_name);
         if let Some(room) = self.rooms.get_mut(&room_name) {
+            let action_str = serde_json::to_string(&RoomAction::PlayerJoined).unwrap();
+            room.send_message(action_str);
             room.add_client(client);
             println!("rooms: {:?}", self.rooms);
             Ok(())

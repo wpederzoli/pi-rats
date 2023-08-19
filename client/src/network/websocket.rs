@@ -1,7 +1,10 @@
 use std::{str::from_utf8, thread};
 
 use actix_codec::Framed;
-use awc::{ws::Codec, BoxedSocket, Client};
+use awc::{
+    ws::{Codec, Frame},
+    BoxedSocket, Client,
+};
 use bevy::prelude::*;
 use common::RoomAction;
 use futures_util::{SinkExt, StreamExt};
@@ -56,8 +59,14 @@ fn read_messages(
         println!("message received {:?}", msg);
         if let Ok(action) = serde_json::from_str::<RoomAction>(&msg) {
             match action {
-                RoomAction::RoomCreated => next_state.set(GameState::Waiting),
+                RoomAction::RoomCreated => {
+                    let wait_for_players =
+                        serde_json::to_string(&RoomAction::WaitingPlayers).unwrap();
+                    ws.sender.send(wait_for_players).unwrap();
+                    next_state.set(GameState::Waiting);
+                }
                 RoomAction::JoinedRoom => next_state.set(GameState::Waiting),
+                RoomAction::PlayerJoined => next_state.set(GameState::GamePlay),
                 _ => info!("invalid action"),
             }
         }
@@ -89,12 +98,17 @@ pub async fn setup(mut commands: Commands) {
             loop {
                 if let Ok(ch_msg) = rx.recv() {
                     println!("received message in thread: {:?}", ch_msg);
-                    if let Ok(_) = serde_json::from_str::<RoomAction>(&ch_msg) {
-                        ws.send(awc::ws::Message::Text(ch_msg.into()))
-                            .await
-                            .unwrap();
+                    if let Ok(msg) = serde_json::from_str::<RoomAction>(&ch_msg) {
+                        match msg {
+                            RoomAction::WaitingPlayers => println!("Waiting for players"),
+                            _ => ws
+                                .send(awc::ws::Message::Text(ch_msg.into()))
+                                .await
+                                .unwrap(),
+                        }
                     }
                 }
+
                 if let Ok(ws_msg) = ws.next().await.unwrap() {
                     match ws_msg {
                         awc::ws::Frame::Text(msg) => match from_utf8(&msg) {
