@@ -5,7 +5,7 @@ use bevy::{
 
 use crate::MainCamera;
 
-use super::Player;
+use super::{player::PlayerControl, Player};
 
 pub struct Target {
     pub id: Option<Entity>,
@@ -43,7 +43,7 @@ impl Default for InputSystem {
 }
 
 pub fn input_system(
-    mut player: Query<&mut InputSystem, With<Player>>,
+    mut player: Query<&mut InputSystem, With<PlayerControl>>,
     mouse_input: Res<Input<MouseButton>>,
     window: Query<&Window, With<PrimaryWindow>>,
     camera: Query<(&Camera, &GlobalTransform), With<MainCamera>>,

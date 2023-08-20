@@ -1,5 +1,5 @@
 use bevy::{
-    prelude::{default, Color, Commands, Transform, Vec2},
+    prelude::{default, Color, Commands, Component, Query, Transform, Vec2, With},
     sprite::{Sprite, SpriteBundle},
 };
 
@@ -8,8 +8,10 @@ use crate::{platforms::cell::CELL_SIZE, WINDOW_HEIGHT, WINDOW_WIDTH};
 use super::{input::InputSystem, Player, PLAYER_LAYER};
 
 pub struct SpawnPlayer(pub PlayerOne);
-
 pub struct PlayerOne(pub bool);
+
+#[derive(Component)]
+pub struct PlayerControl;
 
 //When a player is waiting
 //and another player joins the room

@@ -13,6 +13,7 @@ use crate::{
 use self::{
     cannon::{move_cannonball, shoot_cannon, ShootCannon},
     input::{input_system, InputSystem, Target},
+    player::PlayerControl,
 };
 pub const PLAYER_LAYER: f32 = 2.;
 pub const PLAYER_SPEED: f32 = 2.;
@@ -61,6 +62,7 @@ fn setup(mut commands: Commands) {
             steps: Vec::new(),
         },
         InputSystem::default(),
+        PlayerControl,
     ));
 }
 
