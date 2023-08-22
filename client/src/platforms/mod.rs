@@ -2,9 +2,13 @@ use bevy::prelude::*;
 
 use crate::{GameState, WINDOW_HEIGHT, WINDOW_WIDTH};
 
-use self::cell::{update_cell, GameCell, CELL_SIZE};
+use self::{
+    cell::{GameCell, CELL_SIZE},
+    platform::Platform,
+};
 
 pub mod cell;
+pub mod platform;
 
 pub const PLATFORM_LAYER: f32 = 1.;
 pub const PLATFORM_WIDTH: u8 = 3;
@@ -19,44 +23,62 @@ pub struct PlatformsPlugin;
 
 impl Plugin for PlatformsPlugin {
     fn build(&self, app: &mut App) {
-        app.add_system(setup.in_schedule(OnEnter(GameState::Waiting)))
-            .add_system(update_cell.in_set(OnUpdate(GameState::GamePlay)));
+        app.add_system(setup.in_schedule(OnEnter(GameState::Waiting)));
+        // .add_system(update_cell.in_set(OnUpdate(GameState::GamePlay)));
     }
 }
 
 fn setup(mut commands: Commands) {
-    commands.spawn(SpriteBundle {
-        sprite: Sprite {
-            color: Color::BLUE,
-            custom_size: Some(Vec2::new(WINDOW_WIDTH, WINDOW_HEIGHT)),
-            ..default()
-        },
-        ..default()
-    });
-    for i in 1..=PLATFORM_WIDTH {
-        for j in 1..=PLATFORM_HEIGHT {
-            commands
-                .spawn(create_platform(
-                    (-WINDOW_WIDTH / 2.) + CELL_SIZE * i as f32,
-                    (WINDOW_HEIGHT / 2.) - CELL_SIZE * j as f32,
-                    Vec2::new(CELL_SIZE, CELL_SIZE),
-                ))
-                .insert(MovementPlatform);
-        }
-    }
-    for i in 1..=PLATFORM_WIDTH {
-        for j in 1..=PLATFORM_HEIGHT {
-            commands
-                .spawn(create_platform(
-                    (WINDOW_WIDTH / 2.) - CELL_SIZE * i as f32,
-                    (WINDOW_HEIGHT / 2.) - CELL_SIZE * j as f32,
-                    Vec2::new(CELL_SIZE, CELL_SIZE),
-                ))
-                .insert(TargetPlatform);
-        }
-    }
+    Platform::new(
+        Vec2::new(-WINDOW_WIDTH / 2., (-WINDOW_HEIGHT / 2.) + CELL_SIZE),
+        true,
+        false,
+        &mut commands,
+    );
+    Platform::new(
+        Vec2::new(
+            (-WINDOW_WIDTH / 2.) + CELL_SIZE * 8.,
+            (-WINDOW_HEIGHT / 2.) + CELL_SIZE,
+        ),
+        false,
+        true,
+        &mut commands,
+    );
 }
 
+// fn setup(mut commands: Commands) {
+//     commands.spawn(SpriteBundle {
+//         sprite: Sprite {
+//             color: Color::BLUE,
+//             custom_size: Some(Vec2::new(WINDOW_WIDTH, WINDOW_HEIGHT)),
+//             ..default()
+//         },
+//         ..default()
+//     });
+//     for i in 1..=PLATFORM_WIDTH {
+//         for j in 1..=PLATFORM_HEIGHT {
+//             commands
+//                 .spawn(create_platform(
+//                     (-WINDOW_WIDTH / 2.) + CELL_SIZE * i as f32,
+//                     (WINDOW_HEIGHT / 2.) - CELL_SIZE * j as f32,
+//                     Vec2::new(CELL_SIZE, CELL_SIZE),
+//                 ))
+//                 .insert(MovementPlatform);
+//         }
+//     }
+//     for i in 1..=PLATFORM_WIDTH {
+//         for j in 1..=PLATFORM_HEIGHT {
+//             commands
+//                 .spawn(create_platform(
+//                     (WINDOW_WIDTH / 2.) - CELL_SIZE * i as f32,
+//                     (WINDOW_HEIGHT / 2.) - CELL_SIZE * j as f32,
+//                     Vec2::new(CELL_SIZE, CELL_SIZE),
+//                 ))
+//                 .insert(TargetPlatform);
+//         }
+//     }
+// }
+//
 fn create_platform(x: f32, y: f32, size: Vec2) -> (SpriteBundle, GameCell) {
     (
         SpriteBundle {

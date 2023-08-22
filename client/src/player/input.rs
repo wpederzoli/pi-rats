@@ -3,23 +3,24 @@ use bevy::{
     window::PrimaryWindow,
 };
 
-use crate::MainCamera;
+use crate::{
+    platforms::{platform::GameCell, platform::Platform},
+    MainCamera,
+};
 
 use super::{player::PlayerControl, Player};
 
 pub struct Target {
-    pub id: Option<Entity>,
     pub position: Option<Vec2>,
 }
 
 impl Target {
     pub fn none() -> Self {
-        Target {
-            id: None,
-            position: None,
-        }
+        Target { position: None }
     }
 }
+
+pub struct SelectCell(pub Vec2);
 
 #[derive(Component)]
 pub struct InputSystem {
@@ -30,21 +31,18 @@ pub struct InputSystem {
 impl Default for InputSystem {
     fn default() -> Self {
         InputSystem {
-            destination: Target {
-                id: None,
-                position: None,
-            },
-            target: Target {
-                id: None,
-                position: None,
-            },
+            destination: Target { position: None },
+            target: Target { position: None },
         }
     }
 }
 
 pub fn input_system(
-    mut player: Query<&mut InputSystem, With<PlayerControl>>,
+    mut player: Query<&mut InputSystem>,
     mouse_input: Res<Input<MouseButton>>,
+    mut commands: Commands,
+    mut cells: Query<(&mut Sprite, &Transform), With<GameCell>>,
+    mut platforms: Query<&mut Platform>,
     window: Query<&Window, With<PrimaryWindow>>,
     camera: Query<(&Camera, &GlobalTransform), With<MainCamera>>,
 ) {
@@ -62,7 +60,15 @@ pub fn input_system(
         }
 
         if mouse_input.pressed(MouseButton::Right) {
-            input.target.position = Some(world_position);
+            if let None = input.target.position {
+                for mut platform in platforms.iter_mut() {
+                    if platform.shootable {
+                        input.target = platform
+                            .select_by_position(world_position, &mut cells)
+                            .unwrap();
+                    }
+                }
+            }
         }
     }
 }

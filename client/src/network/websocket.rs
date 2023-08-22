@@ -7,10 +7,7 @@ use common::RoomAction;
 use futures_util::{SinkExt, StreamExt};
 
 use crate::{
-    player::{
-        self,
-        player::{spawn_player, PlayerOne, SpawnPlayer},
-    },
+    player::{player::PlayerBundle, PLAYER_TWO_INITIAL_POS},
     GameState,
 };
 
@@ -71,7 +68,7 @@ fn read_messages(
                 }
                 RoomAction::JoinedRoom => next_state.set(GameState::Waiting),
                 RoomAction::PlayerJoined => {
-                    spawn_player(&mut commands, PlayerOne(false));
+                    commands.spawn(PlayerBundle::new(PLAYER_TWO_INITIAL_POS));
                     next_state.set(GameState::GamePlay);
                 }
                 _ => info!("invalid action"),

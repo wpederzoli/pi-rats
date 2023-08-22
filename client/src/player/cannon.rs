@@ -34,6 +34,7 @@ pub fn shoot_cannon(
     mut player: Query<(&Transform, &mut Player), With<PlayerControl>>,
 ) {
     for _ in listener.iter() {
+        println!("shoot cannon");
         let (transform, mut player) = player.single_mut();
         commands.spawn(spawn_cannonball(Vec2::new(
             transform.translation.x,
@@ -43,35 +44,35 @@ pub fn shoot_cannon(
     }
 }
 
-pub fn move_cannonball(
-    mut cannonball: Query<(&mut Transform, Entity), With<Cannonball>>,
-    mut input: Query<&mut InputSystem>,
-    mut player: Query<&mut Player, With<PlayerControl>>,
-    mut commands: Commands,
-) {
-    for mut input in input.iter_mut() {
-        if let Some(target_pos) = input.target.position {
-            for (mut position, entity) in cannonball.iter_mut() {
-                if let Some(_) = collide(
-                    position.translation,
-                    CANNONBALL_SIZE,
-                    Vec3::new(target_pos.x, target_pos.y, PLATFORM_LAYER),
-                    Vec2::new(CELL_SIZE, CELL_SIZE),
-                ) {
-                    commands.entity(entity).despawn();
-                    commands.entity(input.target.id.unwrap()).despawn();
-                    input.target.id = None;
-                    input.target.position = None;
-                    player.single_mut().cannon_ready = true;
-                } else {
-                    let mut pos = position.clone();
-                    pos.look_at(
-                        Vec3::new(target_pos.x, target_pos.y, CANNONBALL_LAYER),
-                        Vec3::new(position.translation.x, position.translation.y, -1.),
-                    );
-                    position.translation = position.translation + pos.forward() * CANNONBALL_SPEED;
-                }
-            }
-        }
-    }
-}
+// pub fn move_cannonball(
+//     mut cannonball: Query<(&mut Transform, Entity), With<Cannonball>>,
+//     mut input: Query<&mut InputSystem>,
+//     mut player: Query<&mut Player, With<PlayerControl>>,
+//     mut commands: Commands,
+// ) {
+//     for mut input in input.iter_mut() {
+//         if let Some(target_pos) = input.target.position {
+//             for (mut position, entity) in cannonball.iter_mut() {
+//                 if let Some(_) = collide(
+//                     position.translation,
+//                     CANNONBALL_SIZE,
+//                     Vec3::new(target_pos.x, target_pos.y, PLATFORM_LAYER),
+//                     Vec2::new(CELL_SIZE, CELL_SIZE),
+//                 ) {
+//                     commands.entity(entity).despawn();
+//                     commands.entity(input.target.id.unwrap()).despawn();
+//                     input.target.id = None;
+//                     input.target.position = None;
+//                     player.single_mut().cannon_ready = true;
+//                 } else {
+//                     let mut pos = position.clone();
+//                     pos.look_at(
+//                         Vec3::new(target_pos.x, target_pos.y, CANNONBALL_LAYER),
+//                         Vec3::new(position.translation.x, position.translation.y, -1.),
+//                     );
+//                     position.translation = position.translation + pos.forward() * CANNONBALL_SPEED;
+//                 }
+//             }
+//         }
+//     }
+// }
