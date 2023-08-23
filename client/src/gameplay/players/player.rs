@@ -19,12 +19,14 @@ pub struct Player {
 }
 
 impl PlayerBundle {
+    pub const PLAYER_SIZE: Vec2 = Vec2::new(50., 75.);
+
     pub fn new(x: f32, y: f32) -> Self {
         PlayerBundle {
             sprite: SpriteBundle {
                 sprite: Sprite {
                     color: Color::BLUE,
-                    custom_size: Some(Vec2::new(20., 20.)),
+                    custom_size: Some(Self::PLAYER_SIZE),
                     ..default()
                 },
                 transform: Transform::from_xyz(x, y, 5.),

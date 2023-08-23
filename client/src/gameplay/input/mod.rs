@@ -1,11 +1,11 @@
 use bevy::{
-    prelude::{Camera, GlobalTransform, Plugin, Query, With},
+    prelude::{Camera, GlobalTransform, IntoSystemConfig, OnUpdate, Plugin, Query, With},
     window::{PrimaryWindow, Window},
 };
 
 mod input;
 
-use crate::MainCamera;
+use crate::{GameState, MainCamera};
 
 pub use self::input::InputSystem;
 
@@ -13,7 +13,7 @@ pub struct InputSystemPlugin;
 
 impl Plugin for InputSystemPlugin {
     fn build(&self, app: &mut bevy::prelude::App) {
-        app.add_system(update_cursor);
+        app.add_system(update_cursor.in_set(OnUpdate(GameState::GamePlay)));
     }
 }
 

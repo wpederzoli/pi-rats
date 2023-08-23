@@ -1,4 +1,12 @@
-use bevy::prelude::{Commands, Input, MouseButton, Plugin, Query, Res, Transform};
+use bevy::{
+    prelude::{
+        Commands, Input, IntoSystemAppConfig, IntoSystemConfig, MouseButton, OnEnter, OnUpdate,
+        Plugin, Query, Res, Transform,
+    },
+    window::Window,
+};
+
+use crate::{platforms::cell::CELL_SIZE, GameState};
 
 use self::player::{Player, PlayerBundle};
 use super::input::InputSystem;
@@ -10,12 +18,18 @@ pub struct PlayersPlugin;
 
 impl Plugin for PlayersPlugin {
     fn build(&self, app: &mut bevy::prelude::App) {
-        app.add_startup_system(setup).add_system(handle_input);
+        app.add_system(setup.in_schedule(OnEnter(GameState::Waiting)))
+            .add_system(handle_input.in_set(OnUpdate(GameState::GamePlay)));
     }
 }
 
-fn setup(mut commands: Commands) {
-    let player1 = PlayerBundle::new(-400., -100.);
+fn setup(mut commands: Commands, window: Query<&Window>) {
+    let window = window.single();
+
+    let player1 = PlayerBundle::new(
+        (-window.width() / 2.) + CELL_SIZE + PlayerBundle::PLAYER_SIZE.x,
+        (window.height() / 2.) - CELL_SIZE,
+    );
     let player2 = PlayerBundle::new(200., 100.);
 
     commands.spawn((player1, InputSystem::new()));

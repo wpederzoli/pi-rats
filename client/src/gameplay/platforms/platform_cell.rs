@@ -21,7 +21,7 @@ pub enum PlatformSquareKind {
     Shootable,
 }
 
-pub const CELL_SIZE: f32 = 40.;
+pub const CELL_SIZE: f32 = 100.;
 
 impl PlatformSquare {
     pub fn new(kind: PlatformSquareKind) -> Self {

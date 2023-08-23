@@ -63,4 +63,12 @@ impl Platform {
             }
         }
     }
+
+    pub fn height() -> f32 {
+        Self::PLATFORM_HEIGHT as f32 * CELL_SIZE
+    }
+
+    pub fn width() -> f32 {
+        Self::PLATFORM_WIDTH as f32 * CELL_SIZE
+    }
 }

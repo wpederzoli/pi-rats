@@ -12,7 +12,7 @@ impl PluginGroup for GamePlayPlugin {
     fn build(self) -> bevy::app::PluginGroupBuilder {
         PluginGroupBuilder::start::<Self>()
             .add(InputSystemPlugin)
-            .add(PlayersPlugin)
             .add(PlatformsPlugin)
+            .add(PlayersPlugin)
     }
 }

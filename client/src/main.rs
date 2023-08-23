@@ -33,14 +33,17 @@ pub enum GameState {
 
 fn main() {
     App::new()
-        .add_plugins(DefaultPlugins.set(WindowPlugin {
-            primary_window: Some(Window {
-                title: "Pi-Rats".to_string(),
-                resolution: WindowResolution::new(WINDOW_WIDTH, WINDOW_HEIGHT),
+        .add_plugins(
+            DefaultPlugins.set(WindowPlugin {
+                primary_window: Some(Window {
+                    title: "Pi-Rats".to_string(),
+                    resolution: WindowResolution::new(WINDOW_WIDTH, WINDOW_HEIGHT)
+                        .with_scale_factor_override(1.),
+                    ..default()
+                }),
                 ..default()
             }),
-            ..default()
-        }))
+        )
         .add_state::<GameState>()
         .add_startup_system(setup_camera)
         .add_plugins(GamePlayPlugin)
