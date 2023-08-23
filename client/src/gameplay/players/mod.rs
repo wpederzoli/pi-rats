@@ -1,16 +1,9 @@
-use bevy::{
-    prelude::{Commands, EventReader, Input, MouseButton, Plugin, Query, Res, Transform},
-    window::CursorMoved,
-};
+use bevy::prelude::{Commands, Input, MouseButton, Plugin, Query, Res, Transform};
 
-use self::{
-    input::InputSystem,
-    player::{Player, PlayerBundle},
-};
+use self::player::{Player, PlayerBundle};
+use super::input::InputSystem;
 
 mod coordinates;
-mod gameplay_helpers;
-mod input;
 mod player;
 
 pub struct PlayersPlugin;
@@ -31,12 +24,19 @@ fn setup(mut commands: Commands) {
 
 fn handle_input(
     mut player: Query<(&mut Player, &mut InputSystem, &mut Transform)>,
-    cursor_ev: EventReader<CursorMoved>,
     mouse: Res<Input<MouseButton>>,
 ) {
     let (mut player, mut input, mut transform) = player.single_mut();
-    input.update(cursor_ev, mouse);
 
-    gameplay_helpers::handle_mouse_clicks(&mut player, &mut input);
+    if mouse.just_pressed(MouseButton::Left) && !input.left_click() {
+        input.set_left_click(true);
+        player.coordinates.set_destination(input.cursor_pos);
+    }
+
+    if mouse.just_pressed(MouseButton::Right) && !input.right_click() {
+        input.set_right_click(true);
+        player.coordinates.set_target(input.cursor_pos);
+    }
+
     player.update(&mut transform);
 }
