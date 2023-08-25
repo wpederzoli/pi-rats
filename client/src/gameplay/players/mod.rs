@@ -6,10 +6,10 @@ use bevy::{
     window::Window,
 };
 
-use crate::{platforms::cell::CELL_SIZE, GameState};
+use crate::{a_star, platforms::cell::CELL_SIZE, GameState};
 
 use self::player::{Player, PlayerBundle};
-use super::input::InputSystem;
+use super::{input::InputSystem, platforms};
 
 mod coordinates;
 mod player;
@@ -44,7 +44,9 @@ fn handle_input(
 
     if mouse.just_pressed(MouseButton::Left) && !input.left_click() {
         input.set_left_click(true);
+        // let destination = platforms::utils::get_cell_center(input.cursor_pos);
         player.coordinates.set_destination(input.cursor_pos);
+        // let a_star::find_path(player.coordinates.destination.unwrap());
     }
 
     if mouse.just_pressed(MouseButton::Right) && !input.right_click() {

@@ -8,6 +8,7 @@ use main_menu::MainMenuPlugin;
 use network::websocket::WebSocketPlugin;
 use path_finding::PathFindingPlugin;
 
+mod a_star;
 mod gameplay;
 mod main_menu;
 mod network;
