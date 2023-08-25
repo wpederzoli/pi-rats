@@ -1,7 +1,11 @@
 use bevy::{
-    prelude::{Commands, Plugin, Query, Vec2},
+    prelude::{
+        Camera, Commands, GlobalTransform, Input, MouseButton, Plugin, Query, Res, Vec2, With,
+    },
     window::Window,
 };
+
+use crate::MainCamera;
 
 pub struct GamePlay;
 
@@ -12,7 +16,7 @@ mod players;
 
 impl Plugin for GamePlay {
     fn build(&self, app: &mut bevy::prelude::App) {
-        app.add_startup_system(setup);
+        app.add_startup_system(setup).add_system(handle_input);
     }
 }
 
@@ -44,4 +48,31 @@ fn setup(mut commands: Commands, window: Query<&Window>) {
         1,
         2,
     );
+}
+
+fn handle_input(
+    window: Query<&Window>,
+    camera: Query<(&Camera, &GlobalTransform), With<MainCamera>>,
+    mouse_input: Res<Input<MouseButton>>,
+    mut platform: Query<&mut Platform>,
+) {
+    let (camera, camera_transform) = camera.single();
+
+    if let Some(world_position) = window
+        .single()
+        .cursor_position()
+        .and_then(|cursor| camera.viewport_to_world(camera_transform, cursor))
+        .map(|ray| ray.origin.truncate())
+    {}
+
+    // if mouse_input.pressed(MouseButton::Left) {
+    //     if let Some(world_position) = window
+    //         .single()
+    //         .cursor_position()
+    //         .and_then(|cursor| camera.viewport_to_world(camera_transform, cursor))
+    //         .map(|ray| ray.origin.truncate())
+    //     {
+    //         println!("mouse position: {}", world_position);
+    //     }
+    // }
 }

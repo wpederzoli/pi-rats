@@ -5,7 +5,7 @@ use bevy::{
 };
 
 use super::map::map_component::MapComponent;
-
+//We can remove width and height from component
 #[derive(Component, Clone, Copy)]
 pub struct Platform {
     width: f32,
