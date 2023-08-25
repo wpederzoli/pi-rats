@@ -8,6 +8,7 @@ pub struct GamePlay;
 mod background;
 mod map;
 mod platform;
+mod players;
 
 impl Plugin for GamePlay {
     fn build(&self, app: &mut bevy::prelude::App) {
@@ -34,6 +35,8 @@ fn setup(mut commands: Commands, window: Query<&Window>) {
         -4,
         2,
     );
+
+    map.spawn(&mut commands, &mut players::PlayerBundle::new(), -4, 2);
 
     map.spawn(
         &mut commands,
