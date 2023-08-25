@@ -7,6 +7,8 @@ use bevy::{
 
 use crate::MainCamera;
 
+use self::platform::Platform;
+
 pub struct GamePlay;
 
 mod background;
@@ -35,7 +37,7 @@ fn setup(mut commands: Commands, window: Query<&Window>) {
 
     map.spawn(
         &mut commands,
-        &mut platform::PlatformBundle::new(map.cell_size.x * 3., map.cell_size.y * 5.),
+        &mut platform::PlatformBundle::new(map.cell_size.x * 3., map.cell_size.y * 5., true, false),
         -4,
         2,
     );
@@ -44,7 +46,7 @@ fn setup(mut commands: Commands, window: Query<&Window>) {
 
     map.spawn(
         &mut commands,
-        &mut platform::PlatformBundle::new(map.cell_size.x * 3., map.cell_size.y * 5.),
+        &mut platform::PlatformBundle::new(map.cell_size.x * 3., map.cell_size.y * 5., false, true),
         1,
         2,
     );
@@ -54,7 +56,7 @@ fn handle_input(
     window: Query<&Window>,
     camera: Query<(&Camera, &GlobalTransform), With<MainCamera>>,
     mouse_input: Res<Input<MouseButton>>,
-    mut platform: Query<&mut Platform>,
+    mut platforms: Query<&mut Platform>,
 ) {
     let (camera, camera_transform) = camera.single();
 
@@ -63,7 +65,11 @@ fn handle_input(
         .cursor_position()
         .and_then(|cursor| camera.viewport_to_world(camera_transform, cursor))
         .map(|ray| ray.origin.truncate())
-    {}
+    {
+        for platform in platforms.iter_mut() {
+            platform.hover(world_position);
+        }
+    }
 
     // if mouse_input.pressed(MouseButton::Left) {
     //     if let Some(world_position) = window
